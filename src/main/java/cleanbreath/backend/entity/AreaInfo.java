@@ -1,6 +1,8 @@
 package cleanbreath.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 
 @Entity
@@ -17,7 +19,13 @@ public class AreaInfo {
     @Column(name = "implicit_area")
     private String implicitArea;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id")
+    @JsonIgnore
+    @OneToOne(mappedBy = "areaInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private AddressInfo addressInfo;
+
+//    public AreaInfo inputAreaInfo(String divisionArea, String implicitArea) {
+//        this.divisionArea = divisionArea;
+//        this.implicitArea = implicitArea;
+//    }
+
 }

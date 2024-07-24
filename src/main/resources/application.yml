@@ -1,9 +1,6 @@
-server:
-  port: 7000
-
+#server:
+#  port: 7000
 spring:
-  application:
-    name: cleanbreath-backend
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/CleanBreath?serverTimezone=Asia/Seoul
@@ -12,5 +9,9 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
 

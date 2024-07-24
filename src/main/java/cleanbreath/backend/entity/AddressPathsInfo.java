@@ -1,10 +1,11 @@
 package cleanbreath.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 
 @Entity
-@Table(name = "address_path_info")
+@Table(name = "path_info")
 @Getter
 public class AddressPathsInfo {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,7 +18,8 @@ public class AddressPathsInfo {
     @Column(name = "path_lng")
     private String pathLng;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_info")
+    @JsonIgnore
+    @OneToOne(mappedBy = "addressPathsInfo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private AddressInfo addressInfo;
+
 }
