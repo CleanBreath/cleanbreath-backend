@@ -1,5 +1,6 @@
 package cleanbreath.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -8,7 +9,7 @@ import lombok.Getter;
 @Getter
 public class BuildingInfo {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "building_info")
+    @Column(name = "building_id")
     private Long id;
 
     @Column(name = "main_building_no")
@@ -23,7 +24,8 @@ public class BuildingInfo {
     @Column(name = "zone_no")
     private Integer zoneNo;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_info")
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id")
+    @JsonIgnore
     private AddressInfo addressInfo;
 }

@@ -1,5 +1,5 @@
-server:
-  port: 7000
+#server:
+#  port: 7000
 
 spring:
   application:
@@ -12,5 +12,5 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
 

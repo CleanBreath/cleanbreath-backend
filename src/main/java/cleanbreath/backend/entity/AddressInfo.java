@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "address_info")
 @Getter
+@Table(name = "address_info")
 public class AddressInfo {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "address_id")
@@ -25,12 +27,12 @@ public class AddressInfo {
     @Column(name = "address_pos_lng")
     private Double posLng; // 경도
 
-    @OneToOne(mappedBy = "address_info", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private BuildingInfo buildingInfo;
+    @OneToMany(mappedBy = "addressInfo", fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<BuildingInfo> buildingInfo = new ArrayList<>();
 
-    @OneToOne(mappedBy = "address_info", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private AreaInfo areaInfo;
+    @OneToMany(mappedBy = "addressInfo", fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<AreaInfo> areaInfo = new ArrayList<>();
 
-    @OneToOne(mappedBy = "address_info", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private AddressPathsInfo addressPathsInfo;
+    @OneToMany(mappedBy = "addressInfo", fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<AddressPathsInfo> addressPathsInfo = new ArrayList<>();
 }

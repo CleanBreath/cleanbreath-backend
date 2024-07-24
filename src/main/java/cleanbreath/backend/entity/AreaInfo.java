@@ -1,5 +1,6 @@
 package cleanbreath.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -17,7 +18,8 @@ public class AreaInfo {
     @Column(name = "implicit_area")
     private String implicitArea;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
+    @JsonIgnore
     private AddressInfo addressInfo;
 }
