@@ -17,11 +17,10 @@ import java.util.List;
 public class AddressController {
 
     private final AddressService addressService;
-    private final PathService pathService;
 
-    @GetMapping("/api/listAddress")
-    public ResponseEntity<?> getAllAddresses(Pageable pageable) {
-        Page<ResponseAddressDTO> allAddress = addressService.getAllAddress(pageable);
-        return ResponseEntity.ok(allAddress);
+    @GetMapping("/api/allData")
+    public ResponseEntity<List<ResponseAddressDTO>> getAllAddresses() {
+        List<ResponseAddressDTO> allAddresses = addressService.getAllAddresses();
+        return ResponseEntity.ok(allAddresses);
     }
 }

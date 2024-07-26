@@ -38,4 +38,5 @@ public class Address {
 
     @OneToMany(mappedBy = "address", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Path> paths = new ArrayList<>();
+
 }

@@ -17,7 +17,7 @@ public class ResponseAddressDTO {
     private Double latitude;
     private Double longitude;
     private String category;
-    private List<Path> path;
+    private List<ResponsePathDTO> path;
 
     public ResponseAddressDTO(Address address) {
         this.id = address.getId();
@@ -26,6 +26,6 @@ public class ResponseAddressDTO {
         this.latitude = address.getAddressPosLat();
         this.longitude = address.getAddressPosLng();
         this.category = address.getAddressCategory();
-        this.path = address.getPaths();
+        this.path = address.getPaths().stream().map(ResponsePathDTO::new).toList();
     }
 }

@@ -3,9 +3,9 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/CleanBreath?serverTimezone=Asia/Seoul
-    username: root
-    password: Dnfltkfkd0306
+    url: jdbc:mysql://49.170.49.164:23306/daelim?serverTimezone=Asia/Seoul
+    username: daelim
+    password: jmj.ga7@vcUHK@WDgdn.
   data:
     web:
       pageable:

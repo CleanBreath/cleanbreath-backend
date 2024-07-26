@@ -19,13 +19,14 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class AddressServiceImpl implements AddressService {
     private final AddressRepository addressRepository;
-    private final PathRepository pathRepository;
 
     public List<ResponseAddressDTO> getAllAddresses() {
         List<Address> findAddressList = addressRepository.findAll();
+
         return findAddressList.stream()
                 .map(ResponseAddressDTO::new)
                 .toList();
+
     }
 
     public Page<ResponseAddressDTO> getAllAddress(Pageable pageable) {
