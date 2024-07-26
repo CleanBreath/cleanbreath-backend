@@ -1,14 +1,14 @@
 package cleanbreath.backend.service.impl;
 
-import cleanbreath.backend.dto.AddressDTO.RequestAddressDTO;
-import cleanbreath.backend.dto.AddressDTO.ResponseAddressDTO;
+import cleanbreath.backend.dto.AddressDTO.*;
+import cleanbreath.backend.dto.PathDTO.ResponsePathDTO;
 import cleanbreath.backend.entity.Address;
 import cleanbreath.backend.repository.AddressRepository;
-import cleanbreath.backend.repository.PathRepository;
 import cleanbreath.backend.service.AddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,66 +20,66 @@ import java.util.List;
 public class AddressServiceImpl implements AddressService {
     private final AddressRepository addressRepository;
 
-    public List<ResponseAddressDTO> getAllAddresses() {
+    // 전체 데이터 가져오기
+    public List<ResponseAllAddressDTO> getAllAddresses() {
         List<Address> findAddressList = addressRepository.findAll();
 
         return findAddressList.stream()
-                .map(ResponseAddressDTO::new)
+                .map(ResponseAllAddressDTO::new)
                 .toList();
-
     }
 
-    public Page<ResponseAddressDTO> getAllAddress(Pageable pageable) {
+    // 전체 데이터 가져오기 (페이징 시스템 추가된 버전)
+    public Page<ResponseAllAddressDTO> getAllAddress(Pageable pageable) {
         return addressRepository.findAll(pageable)
-                .map(ResponseAddressDTO::new);
+                .map(ResponseAllAddressDTO::new);
     }
 
-    public ResponseAddressDTO getAddress(Long addressId) {
-        Address findAddress = addressRepository.findById(addressId).orElseThrow(
-                () -> new IllegalArgumentException("This Address ID doses not exist")
-        );
+    // 좌표값을 입력받아 해당 주소 가져오기
+    public ResponseAddressDTO getAddress(Double lat, Double lng) {
+        Address findAddress = addressRepository.findByAddressPosLatAndAddressPosLng(lat, lng)
+                .orElseThrow(() -> new RuntimeException("Address not found"));
+
         return new ResponseAddressDTO(findAddress);
     }
 
+    // 주소 저장
     @Transactional
-    public void deleteAddress(Long addressId) {
+    public ResponseSaveAddressDTO saveAddress(RequestAddressDTO requestAddressDTO) {
+        if (!saveAddressValid(requestAddressDTO)) {
+            return new ResponseSaveAddressDTO(HttpStatus.NOT_FOUND, "주소 저장 실패");
+        }
+        Address saveAddress = requestAddressDTO.toEntity();
+
+        addressRepository.save(saveAddress);
+
+        return new ResponseSaveAddressDTO(HttpStatus.OK, "주소 저장 성공");
+    }
+
+    // 주소 삭제
+    @Transactional
+    public ResponseDeleteAddressDTO deleteAddress(Long addressId) {
         addressRepository.deleteById(addressId);
-    }
 
-    @Transactional
-    public Address saveAddress(RequestAddressDTO requestAddressDTO) {
-        if (!validateAddress(requestAddressDTO)) {
-            throw new IllegalArgumentException("Invalid Address");
-        }
-        Address address = Address.builder()
-                .updateAt(requestAddressDTO.getUpdateAt())
-                .addressName(requestAddressDTO.getAddressName())
-                .buildingName(requestAddressDTO.getBuildingName())
-                .addressPosLat(requestAddressDTO.getLatitude())
-                .addressPosLng(requestAddressDTO.getLongitude())
-                .addressCategory(requestAddressDTO.getCategory())
-                .build();
-
-        return addressRepository.save(address);
+        return new ResponseDeleteAddressDTO(HttpStatus.OK, "해당 주소 삭제 성공");
     }
 
 
-    private boolean validateAddress(RequestAddressDTO requestAddressDTO) {
-        if (requestAddressDTO.getAddressName().isEmpty()) {
+    // Save Address Validation Check
+    private boolean saveAddressValid(RequestAddressDTO address) {
+        if (address.getAddressName().isEmpty() || address.getBuildingName().isEmpty()) {
             return false;
         }
-        if (requestAddressDTO.getBuildingName().isEmpty()) {
+        if (address.getLatitude().isNaN() || address.getLongitude().isNaN()) {
             return false;
         }
-        if (null == requestAddressDTO.getLatitude()) {
+        if (address.getUpdateAt() == null || address.getCategory().isEmpty()) {
             return false;
         }
-        if (null == requestAddressDTO.getLongitude()) {
+        if (address.getPaths().isEmpty()) {
             return false;
         }
-        if (requestAddressDTO.getCategory().isEmpty()) {
-            return false;
-        }
+
         return true;
     }
 }

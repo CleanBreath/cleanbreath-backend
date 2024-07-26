@@ -2,11 +2,13 @@ package cleanbreath.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
 @Entity
 @Table(name = "path")
-@Getter
+@Getter @Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Path {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "path_id")
@@ -20,9 +22,9 @@ public class Path {
     @Enumerated(EnumType.STRING)
     private DivisionArea divisionArea;
 
-    @Column(name = "path_lat")
+    @Column(name = "path_lat", columnDefinition = "MEDIUMTEXT")
     private String pathLat;
 
-    @Column(name = "path_lng")
+    @Column(name = "path_lng", columnDefinition = "MEDIUMTEXT")
     private String pathLng;
 }
