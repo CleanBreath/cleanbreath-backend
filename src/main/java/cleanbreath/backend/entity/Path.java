@@ -27,4 +27,6 @@ public class Path {
 
     @Column(name = "path_lng", columnDefinition = "MEDIUMTEXT")
     private String pathLng;
+
+
 }

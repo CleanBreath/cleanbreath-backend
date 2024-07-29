@@ -1,11 +1,14 @@
 package cleanbreath.backend.service.impl;
 
 import cleanbreath.backend.dto.AddressDTO.*;
-import cleanbreath.backend.dto.PathDTO.ResponsePathDTO;
+import cleanbreath.backend.dto.PathDTO.RequestPathDTO;
 import cleanbreath.backend.entity.Address;
+import cleanbreath.backend.entity.Path;
 import cleanbreath.backend.repository.AddressRepository;
+import cleanbreath.backend.repository.PathRepository;
 import cleanbreath.backend.service.AddressService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,9 +19,10 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true) @Slf4j
 public class AddressServiceImpl implements AddressService {
     private final AddressRepository addressRepository;
+    private final PathRepository pathRepository;
 
     // 전체 데이터 가져오기
     public List<ResponseAllAddressDTO> getAllAddresses() {
@@ -43,17 +47,28 @@ public class AddressServiceImpl implements AddressService {
         return new ResponseAddressDTO(findAddress);
     }
 
-    // 주소 저장
+    // 주소 및 영역 저장
     @Transactional
-    public ResponseSaveAddressDTO saveAddress(RequestAddressDTO requestAddressDTO) {
-        if (!saveAddressValid(requestAddressDTO)) {
-            return new ResponseSaveAddressDTO(HttpStatus.NOT_FOUND, "주소 저장 실패");
+    public ResponseSaveMessage saveAddress(RequestAddressDTO address) {
+        if (!saveAddressValid(address)) {
+            return new ResponseSaveMessage(HttpStatus.NOT_FOUND, "주소 및 영역 저장실패");
         }
-        Address saveAddress = requestAddressDTO.toEntity();
 
+        Address saveAddress = address.toEntity();
         addressRepository.save(saveAddress);
 
-        return new ResponseSaveAddressDTO(HttpStatus.OK, "주소 저장 성공");
+        for (RequestPathDTO path : address.getPaths()) {
+            Path savePath = Path.builder()
+                    .divisionArea(path.getDivisionArea())
+                    .pathLat(path.getPathLat())
+                    .pathLng(path.getPathLng())
+                    .address(saveAddress)
+                    .build();
+
+            pathRepository.save(savePath);
+        }
+
+        return new ResponseSaveMessage(HttpStatus.CREATED, "주소 저장성공");
     }
 
     // 주소 삭제
@@ -76,10 +91,6 @@ public class AddressServiceImpl implements AddressService {
         if (address.getUpdateAt() == null || address.getCategory().isEmpty()) {
             return false;
         }
-        if (address.getPaths().isEmpty()) {
-            return false;
-        }
-
         return true;
     }
 }

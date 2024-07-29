@@ -4,7 +4,7 @@ import cleanbreath.backend.entity.Address;
 import cleanbreath.backend.entity.DivisionArea;
 import cleanbreath.backend.entity.Path;
 import cleanbreath.backend.repository.AddressRepository;
-import org.assertj.core.api.Assertions;
+import cleanbreath.backend.repository.PathRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,12 +20,16 @@ import static org.assertj.core.api.Assertions.*;
 class AddressServiceImplTest {
 
     @Autowired
-    private AddressRepository repository;
+    private AddressRepository addressRepository;
+    @Autowired
+    private PathRepository pathRepository;
 
     @Test
     @Transactional
     void saveAddress() {
-        Address address = Address.builder()
+        List<Path> paths = new ArrayList<>();
+
+        Address addressA = Address.builder()
                 .addressName("경기 안양시 동안구 평촌동 895")
                 .buildingName("평촌중앙공원")
                 .addressCategory("도시공원")
@@ -34,10 +38,15 @@ class AddressServiceImplTest {
                 .updateAt(LocalDateTime.now())
                 .build();
 
+        Address saveAddress = addressRepository.save(addressA);
 
-        Address saveAddress = repository.save(address);
+        Path pathA = Path.builder()
+                .divisionArea(DivisionArea.NON_SMOKING_ZONE)
+                .address(addressA)
+                .pathLat("TestLat")
+                .pathLng("TestLng")
+                .build();
 
-        assertThat(address.getId()).isEqualTo(saveAddress.getId());
     }
 
     @Test

@@ -1,13 +1,15 @@
 package cleanbreath.backend.controller;
 
+import cleanbreath.backend.dto.AddressDTO.RequestAddressDTO;
 import cleanbreath.backend.dto.AddressDTO.ResponseAddressDTO;
 import cleanbreath.backend.dto.AddressDTO.ResponseAllAddressDTO;
+import cleanbreath.backend.dto.AddressDTO.ResponseSaveMessage;
 import cleanbreath.backend.service.AddressService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,5 +29,10 @@ public class AddressController {
     public ResponseEntity<ResponseAddressDTO> getAddress(@RequestParam("lat") Double lat, @RequestParam("lng") Double lng) {
         ResponseAddressDTO findAddress = addressService.getAddress(lat, lng);
         return ResponseEntity.ok(findAddress);
+    }
+
+    @PostMapping("/v1/saveData")
+    public ResponseEntity<ResponseSaveMessage> saveAddress(@RequestBody RequestAddressDTO address) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(addressService.saveAddress(address));
     }
 }
