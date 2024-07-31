@@ -1,11 +1,14 @@
-#server:
-#  port: 7000
+server:
+  port: 7001
+
 spring:
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://49.170.49.164:23306/daelim?serverTimezone=Asia/Seoul
-    username: daelim
-    password: jmj.ga7@vcUHK@WDgdn.
+    url: jdbc:mysql://${DB_URL}/${DEFAULT_SCHEMA}?serverTimezone=Asia/Seoul
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   data:
     web:
       pageable:
@@ -21,8 +24,8 @@ spring:
       ddl-auto: validate
     properties:
       hibernate:
-        show_sql: true
-        format_sql: true
+        show_sql: false
+        format_sql: false
 
 
 

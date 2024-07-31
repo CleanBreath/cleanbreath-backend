@@ -1,16 +1,15 @@
 package cleanbreath.backend.controller;
 
-import cleanbreath.backend.dto.AddressDTO.RequestAddressDTO;
-import cleanbreath.backend.dto.AddressDTO.ResponseAddressDTO;
-import cleanbreath.backend.dto.AddressDTO.ResponseAllAddressDTO;
-import cleanbreath.backend.dto.AddressDTO.ResponseSaveMessage;
+import cleanbreath.backend.dto.AddressDTO.*;
+import cleanbreath.backend.dto.ResponseAllDataUpdateCheckDTO;
 import cleanbreath.backend.service.AddressService;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -20,9 +19,11 @@ public class AddressController {
     private final AddressService addressService;
 
     @GetMapping("/v1/allData")
-    public ResponseEntity<List<ResponseAllAddressDTO>> getAllAddresses() {
-        List<ResponseAllAddressDTO> allAddresses = addressService.getAllAddresses();
-        return ResponseEntity.ok(allAddresses);
+    public ResponseEntity<?> getAllAddresses() {
+        List<ResponseAllAddressDTO> result = addressService.getAllAddresses();
+        LocalDateTime updateAt = LocalDateTime.now();
+
+        return ResponseEntity.ok(new ResponseAllDataUpdateCheckDTO<>(result.size(), updateAt, result));
     }
 
     @GetMapping("/v1/data")
@@ -31,8 +32,13 @@ public class AddressController {
         return ResponseEntity.ok(findAddress);
     }
 
-    @PostMapping("/v1/saveData")
-    public ResponseEntity<ResponseSaveMessage> saveAddress(@RequestBody RequestAddressDTO address) {
+//    @PostMapping("/v1/saveData")
+    public ResponseEntity<ResponseMessage> saveAddress(@RequestBody RequestAddressDTO address) {
         return ResponseEntity.status(HttpStatus.CREATED).body(addressService.saveAddress(address));
+    }
+
+    @GetMapping("/v1/updateDate")
+    public ResponseEntity<?> updateAddress(@RequestBody RequestCheckUpdateAtDTO updateAtDTO) {
+        return ResponseEntity.status(HttpStatus.OK).body(addressService.updateAddress(updateAtDTO));
     }
 }

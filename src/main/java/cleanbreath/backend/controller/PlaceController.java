@@ -15,7 +15,7 @@ public class PlaceController {
 
     private final PlaceService placeService;
 
-    @GetMapping("/v1/find-50m-place")
+//    @GetMapping("/v1/find-50m-place") 아직 사용 X
     public List<ResponseGetPlaceDTO> getPlaceWithRadius(@RequestParam("currentLat") double currentLat, @RequestParam("currentLng") double currentLng) {
         return placeService.findPlacesWithinRadius(currentLat, currentLng);
     }

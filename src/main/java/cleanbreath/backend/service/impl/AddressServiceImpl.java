@@ -2,6 +2,7 @@ package cleanbreath.backend.service.impl;
 
 import cleanbreath.backend.dto.AddressDTO.*;
 import cleanbreath.backend.dto.PathDTO.RequestPathDTO;
+import cleanbreath.backend.dto.ResponseAllDataUpdateCheckDTO;
 import cleanbreath.backend.entity.Address;
 import cleanbreath.backend.entity.Path;
 import cleanbreath.backend.repository.AddressRepository;
@@ -12,9 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -49,9 +53,9 @@ public class AddressServiceImpl implements AddressService {
 
     // 주소 및 영역 저장
     @Transactional
-    public ResponseSaveMessage saveAddress(RequestAddressDTO address) {
+    public ResponseMessage saveAddress(RequestAddressDTO address) {
         if (!saveAddressValid(address)) {
-            return new ResponseSaveMessage(HttpStatus.NOT_FOUND, "주소 및 영역 저장실패");
+            return new ResponseMessage(HttpStatus.NOT_FOUND, "주소 및 영역 저장실패");
         }
 
         Address saveAddress = address.toEntity();
@@ -68,7 +72,7 @@ public class AddressServiceImpl implements AddressService {
             pathRepository.save(savePath);
         }
 
-        return new ResponseSaveMessage(HttpStatus.CREATED, "주소 저장성공");
+        return new ResponseMessage(HttpStatus.CREATED, "주소 저장성공");
     }
 
     // 주소 삭제
@@ -77,6 +81,21 @@ public class AddressServiceImpl implements AddressService {
         addressRepository.deleteById(addressId);
 
         return new ResponseDeleteAddressDTO(HttpStatus.OK, "해당 주소 삭제 성공");
+    }
+
+    // 주소 데이터 업데이트
+    public Object updateAddress(RequestCheckUpdateAtDTO updateAtDTO) {
+        List<Address> result = addressRepository.findAll();
+        LocalDateTime currentDate = LocalDateTime.now();
+
+        LocalDateTime checkingUpdateAt = updateAtDTO.getUpdateDate();
+        long daysBetween = ChronoUnit.DAYS.between(currentDate, checkingUpdateAt);
+
+        if (daysBetween >= 30) {
+            return new ResponseAllDataUpdateCheckDTO<>(result.size(), currentDate, result);
+        } else {
+            return new ResponseMessage(HttpStatus.NOT_MODIFIED, "아직 업데이트 시기가 아닙니다.");
+        }
     }
 
 

@@ -6,11 +6,11 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @Setter
-public class ResponseSaveMessage {
+public class ResponseMessage {
     private HttpStatus status;
     private String message;
 
-    public ResponseSaveMessage(HttpStatus status, String message) {
+    public ResponseMessage(HttpStatus status, String message) {
         this.status = status;
         this.message = message;
     }
