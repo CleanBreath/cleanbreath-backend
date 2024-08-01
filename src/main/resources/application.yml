@@ -27,5 +27,3 @@ spring:
         show_sql: false
         format_sql: false
 
-
-
