@@ -34,7 +34,7 @@ public class FeedBackServiceImpl implements FeedbackService {
         return result.stream().map(ResponseListFeedbackDTO::new).toList();
     }
 
-    public Object findFeedback(RequestFeedbackAccountDTO accountDTO) {
+    public Object findFeedback(Long id, RequestFeedbackAccountDTO accountDTO) {
         Optional<Feedback> userAccount = feedbackRepository
                 .findByUsernameAndPassword(accountDTO.getUsername(), accountDTO.getPassword());
 
@@ -42,25 +42,29 @@ public class FeedBackServiceImpl implements FeedbackService {
             return new ResponseMessage(HttpStatus.UNAUTHORIZED, "아이디 및 비밀번호가 틀렸습니다.");
         }
 
-        Feedback findFeedback = feedbackRepository.findById(accountDTO.getId())
+        Feedback findFeedback = feedbackRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 피드백은 없는 피드백입니다."));
 
         return new ResponseFeedbackDTO(findFeedback);
     }
 
     @Transactional
-    public ResponseMessage updateFeedBack(RequestUpdateFeedbackDTO updateDTO) {
-        Feedback findFeedback = feedbackRepository.findById(updateDTO.getId())
+    public ResponseMessage updateFeedBack(Long id, RequestUpdateFeedbackDTO updateDTO) {
+        Feedback findFeedback = feedbackRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 피드백은 없습니다."));
-
         findFeedback.updateFeedback(
                 updateDTO.getUpdateAt(),
                 updateDTO.getTitle(),
                 updateDTO.getContent()
         );
-
         return new ResponseMessage(HttpStatus.OK, "업데이트 성공");
+    }
 
+    @Transactional
+    public ResponseMessage deleteFeedback(Long id) {
+        feedbackRepository.deleteById(id);
+
+        return new ResponseMessage(HttpStatus.OK, "피드백 삭제 완료");
     }
 
 

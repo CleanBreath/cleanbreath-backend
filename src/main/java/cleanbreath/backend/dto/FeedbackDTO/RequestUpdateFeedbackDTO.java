@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 @Getter @Setter
 public class RequestUpdateFeedbackDTO {
-    private Long id;
     private LocalDateTime updateAt;
     private String title;
     private String content;

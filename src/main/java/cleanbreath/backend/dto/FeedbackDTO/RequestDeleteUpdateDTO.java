@@ -5,7 +5,5 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RequestFeedbackAccountDTO {
-    private String username;
-    private String password;
+public class RequestDeleteUpdateDTO {
 }
