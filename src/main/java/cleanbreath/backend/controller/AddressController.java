@@ -32,11 +32,6 @@ public class AddressController {
         return ResponseEntity.ok(findAddress);
     }
 
-//    @PostMapping("/v1/saveData")
-    public ResponseEntity<ResponseMessage> saveAddress(@RequestBody RequestAddressDTO address) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(addressService.saveAddress(address));
-    }
-
     @GetMapping("/v1/updateDate")
     public ResponseEntity<?> updateAddress(@RequestBody RequestCheckUpdateAtDTO updateAtDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(addressService.updateAddress(updateAtDTO));

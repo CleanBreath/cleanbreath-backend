@@ -101,13 +101,13 @@ public class AddressServiceImpl implements AddressService {
 
     // Save Address Validation Check
     private boolean saveAddressValid(RequestAddressDTO address) {
-        if (address.getAddressName().isEmpty() || address.getBuildingName().isEmpty()) {
+        if (address.getAddressName().isEmpty() && address.getBuildingName().isEmpty()) {
             return false;
         }
-        if (address.getLatitude().isNaN() || address.getLongitude().isNaN()) {
+        if (address.getLatitude().isNaN() && address.getLongitude().isNaN()) {
             return false;
         }
-        if (address.getUpdateAt() == null || address.getCategory().isEmpty()) {
+        if (address.getUpdateAt() == null && address.getCategory().isEmpty()) {
             return false;
         }
         return true;
