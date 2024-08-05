@@ -32,7 +32,7 @@ public class AddressController {
         return ResponseEntity.ok(findAddress);
     }
 
-    @GetMapping("/v1/updateDate")
+    @PostMapping("/v1/updateDate")
     public ResponseEntity<?> updateAddress(@RequestBody RequestCheckUpdateAtDTO updateAtDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(addressService.updateAddress(updateAtDTO));
     }
