@@ -1,22 +1,20 @@
 package cleanbreath.backend.dto.AddressDTO;
 
 import cleanbreath.backend.dto.PathDTO.RequestPathDTO;
-import cleanbreath.backend.dto.PathDTO.ResponsePathDTO;
-import cleanbreath.backend.entity.Address;
-import cleanbreath.backend.entity.Path;
+import cleanbreath.backend.entity.manage.ManageAddress;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 @Getter
 @Setter
 public class RequestAddressDTO {
+    private String username;
+    private String password;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime updateAt;
     private String addressName;
@@ -26,8 +24,10 @@ public class RequestAddressDTO {
     private String category;
     private List<RequestPathDTO> paths;
 
-    public Address toEntity() {
-        return Address.builder()
+    public ManageAddress toEntity() {
+        return ManageAddress.builder()
+                .username(username)
+                .password(password)
                 .addressName(addressName)
                 .buildingName(buildingName)
                 .updateAt(updateAt)
