@@ -36,6 +36,7 @@ public class Address {
     @Column(name = "address_category")
     private String addressCategory;
 
+    @Builder.Default
     @OneToMany(mappedBy = "address", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Path> paths = new ArrayList<>();
 }

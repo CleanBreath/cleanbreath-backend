@@ -26,3 +26,5 @@ spring:
       hibernate:
         show_sql: false
         format_sql: false
+
+file.dir: ~/uploadFiles
