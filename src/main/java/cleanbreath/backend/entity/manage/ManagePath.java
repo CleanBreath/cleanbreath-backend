@@ -19,6 +19,7 @@ public class ManagePath {
     private ManageAddress manageAddress;
 
     @Column(name = "m_division_area")
+    @Enumerated(EnumType.STRING)
     private DivisionArea divisionArea;
 
     @Column(name = "m_path_lat", columnDefinition = "MEDIUMTEXT")

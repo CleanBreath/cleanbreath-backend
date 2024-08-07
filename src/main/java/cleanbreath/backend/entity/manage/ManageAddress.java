@@ -18,14 +18,6 @@ public class ManageAddress {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 요청한 사용자 이름
-    @Column(name = "r_username")
-    private String username;
-
-    // 요청한 사용자 비밀번호
-    @Column(name = "r_password")
-    private String password;
-
     @Column(name = "m_update_at")
     private LocalDateTime updateAt;
 

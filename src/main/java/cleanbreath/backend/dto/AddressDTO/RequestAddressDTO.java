@@ -12,8 +12,6 @@ import java.util.List;
 @Getter
 @Setter
 public class RequestAddressDTO {
-    private String username;
-    private String password;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime updateAt;
@@ -26,8 +24,6 @@ public class RequestAddressDTO {
 
     public ManageAddress toEntity() {
         return ManageAddress.builder()
-                .username(username)
-                .password(password)
                 .addressName(addressName)
                 .buildingName(buildingName)
                 .updateAt(updateAt)
