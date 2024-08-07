@@ -42,4 +42,9 @@ public class ApartmentPath {
 
     @Column(name = "apartment_lng")
     private Double apartmentLng;
+
+    @Column(name = "paths_lat")
+    private String pathsLat;
+    @Column(name = "paths_lng")
+    private String pathsLng;
 }

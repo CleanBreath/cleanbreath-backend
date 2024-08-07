@@ -34,6 +34,10 @@ public class QApartmentPath extends EntityPathBase<ApartmentPath> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final StringPath pathsLat = createString("pathsLat");
+
+    public final StringPath pathsLng = createString("pathsLng");
+
     public final EnumPath<NonSmokingStatus> stairs = createEnum("stairs", NonSmokingStatus.class);
 
     public final EnumPath<NonSmokingStatus> undergroundParkingLot = createEnum("undergroundParkingLot", NonSmokingStatus.class);
