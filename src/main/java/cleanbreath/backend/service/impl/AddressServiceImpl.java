@@ -53,13 +53,17 @@ public class AddressServiceImpl implements AddressService {
     // 주소 데이터 업데이트
     public Object updateAddress(RequestCheckUpdateAtDTO updateAtDTO) {
         List<Address> result = addressRepository.findAll();
+        List<ResponseAddressDTO> convertResult = result.stream()
+                .map(ResponseAddressDTO::new)
+                .toList();
+
         LocalDateTime currentDate = LocalDateTime.now();
 
         LocalDateTime checkingUpdateAt = updateAtDTO.getUpdateDate();
         long daysBetween = ChronoUnit.DAYS.between(currentDate, checkingUpdateAt);
 
         if (daysBetween >= 30) {
-            return new ResponseAllDataUpdateCheckDTO<>(result.size(), currentDate, result);
+            return new ResponseAllDataUpdateCheckDTO<>(convertResult.size(), currentDate, convertResult);
         } else {
             return new ResponseMessage(HttpStatus.NOT_MODIFIED, "아직 업데이트 시기가 아닙니다.");
         }
