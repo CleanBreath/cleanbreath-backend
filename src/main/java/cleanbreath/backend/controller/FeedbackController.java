@@ -1,13 +1,11 @@
 package cleanbreath.backend.controller;
 
 import cleanbreath.backend.dto.AddressDTO.ResponseMessage;
-import cleanbreath.backend.dto.FeedbackDTO.RequestFeedbackAccountDTO;
-import cleanbreath.backend.dto.FeedbackDTO.RequestSaveFeedBackDTO;
-import cleanbreath.backend.dto.FeedbackDTO.RequestUpdateFeedbackDTO;
-import cleanbreath.backend.dto.FeedbackDTO.ResponseListFeedbackDTO;
+import cleanbreath.backend.dto.FeedbackDTO.*;
 import cleanbreath.backend.service.FeedbackService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,8 +33,8 @@ public class FeedbackController {
 
     // 해당 피드백 가져오기
     @GetMapping("/v1/feedback/{id}")
-    public ResponseEntity<?> getFeedbackById(@PathVariable("id") Long id, @RequestBody RequestFeedbackAccountDTO accountDTO) {
-        Object findFeedback = feedbackService.findFeedback(id, accountDTO);
+    public ResponseEntity<ResponseFeedbackDTO> getFeedbackById(@PathVariable("id") Long id) {
+        ResponseFeedbackDTO findFeedback = feedbackService.findFeedback(id);
         return ResponseEntity.ok(findFeedback);
     }
 

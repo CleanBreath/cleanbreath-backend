@@ -19,12 +19,6 @@ public class Feedback {
     @Column(name = "fd_create_at")
     private LocalDateTime createAt;
 
-    @Column(name = "fd_username")
-    private String username;
-
-    @Column(name = "fd_password")
-    private String password;
-
     @Column(name = "fd_title")
     private String title;
 

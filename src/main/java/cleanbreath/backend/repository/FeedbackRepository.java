@@ -8,5 +8,4 @@ import java.util.Optional;
 
 @Repository
 public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
-    Optional<Feedback> findByUsernameAndPassword(String username, String password);
 }

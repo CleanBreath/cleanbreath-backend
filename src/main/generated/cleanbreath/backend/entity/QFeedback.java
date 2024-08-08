@@ -25,11 +25,7 @@ public class QFeedback extends EntityPathBase<Feedback> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final StringPath password = createString("password");
-
     public final StringPath title = createString("title");
-
-    public final StringPath username = createString("username");
 
     public QFeedback(String variable) {
         super(Feedback.class, forVariable(variable));

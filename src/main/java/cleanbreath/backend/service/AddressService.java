@@ -13,7 +13,5 @@ public interface AddressService {
     List<ResponseAllAddressDTO> getAllAddresses();
     Page<ResponseAllAddressDTO> getAllAddress(Pageable pageable);
     ResponseAddressDTO getAddress(Double lat, Double lng);
-    ResponseMessage saveAddress(RequestAddressDTO address);
-    ResponseDeleteAddressDTO deleteAddress(Long addressId);
     Object updateAddress(RequestCheckUpdateAtDTO updateAtDTO);
 }

@@ -10,14 +10,12 @@ import java.time.LocalDateTime;
 @Setter
 public class ResponseFeedbackDTO {
     private Long id;
-    private String username;
     private LocalDateTime createAt;
     private String title;
     private String content;
 
     public ResponseFeedbackDTO(Feedback feedback) {
         this.id = feedback.getId();
-        this.username = feedback.getUsername();
         this.createAt = feedback.getCreateAt();
         this.title = feedback.getTitle();
         this.content = feedback.getContent();

@@ -12,12 +12,10 @@ public class ResponseListFeedbackDTO {
     private Long feedback_id;
     private LocalDateTime createAt;
     private String title;
-    private String username;
 
     public ResponseListFeedbackDTO(Feedback feedback) {
         this.feedback_id = feedback.getId();
         this.createAt = feedback.getCreateAt();
         this.title = feedback.getTitle();
-        this.username = feedback.getUsername();
     }
 }

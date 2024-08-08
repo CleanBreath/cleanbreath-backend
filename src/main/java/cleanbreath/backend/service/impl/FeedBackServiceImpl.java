@@ -34,16 +34,9 @@ public class FeedBackServiceImpl implements FeedbackService {
         return result.stream().map(ResponseListFeedbackDTO::new).toList();
     }
 
-    public Object findFeedback(Long id, RequestFeedbackAccountDTO accountDTO) {
-        Optional<Feedback> userAccount = feedbackRepository
-                .findByUsernameAndPassword(accountDTO.getUsername(), accountDTO.getPassword());
-
-        if (userAccount.isEmpty()) {
-            return new ResponseMessage(HttpStatus.UNAUTHORIZED, "아이디 및 비밀번호가 틀렸습니다.");
-        }
-
+    public ResponseFeedbackDTO findFeedback(Long id) {
         Feedback findFeedback = feedbackRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 피드백은 없는 피드백입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 피드백은 존재하지 않습니다."));
 
         return new ResponseFeedbackDTO(findFeedback);
     }
@@ -69,9 +62,6 @@ public class FeedBackServiceImpl implements FeedbackService {
 
 
     private boolean saveValidation(RequestSaveFeedBackDTO feedBackDTO) {
-        if (feedBackDTO.getUsername().isEmpty() && feedBackDTO.getPassword().isEmpty()) {
-            return false;
-        }
         if (feedBackDTO.getTitle().isEmpty() && feedBackDTO.getContent().isEmpty()) {
             return false;
         }
