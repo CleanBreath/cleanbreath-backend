@@ -2,9 +2,12 @@ package cleanbreath.backend.service;
 
 import cleanbreath.backend.dto.AddressDTO.ResponseMessage;
 import cleanbreath.backend.dto.Manage.ManageMemberDTO.RequestManageMemberDTO;
+import cleanbreath.backend.dto.Manage.ManageMemberDTO.ResponseManageMemberDTO;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 public interface ManageMemberService {
-    ResponseMessage login(RequestManageMemberDTO loginForm, HttpSession session);
-    ResponseMessage logout(HttpSession session);
+    ResponseManageMemberDTO login(RequestManageMemberDTO loginForm, HttpServletRequest request);
+    ResponseMessage logout(HttpServletRequest request, HttpServletResponse response);
 }
