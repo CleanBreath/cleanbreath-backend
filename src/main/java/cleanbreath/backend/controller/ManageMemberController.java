@@ -21,8 +21,7 @@ public class ManageMemberController {
 
     @PostMapping("/manage/login")
     public ResponseEntity<ResponseManageMemberDTO> login(@RequestBody RequestManageMemberDTO loginForm, HttpServletRequest request) {
-        ResponseManageMemberDTO login = manageMemberService.login(loginForm, request);
-        return ResponseEntity.ok(login);
+      return manageMemberService.login(loginForm, request);
     }
 
     @PostMapping("/manage/logout")
