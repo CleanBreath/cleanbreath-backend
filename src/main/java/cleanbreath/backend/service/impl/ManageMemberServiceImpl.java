@@ -12,7 +12,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,17 +28,22 @@ public class ManageMemberServiceImpl implements ManageMemberService {
     private final ManageMemberRepository manageMemberRepository;
     private final static String SESSION_KEY = "ManageMember";
 
-    public ResponseManageMemberDTO login(RequestManageMemberDTO loginForm, HttpServletRequest request) {
+    public ResponseEntity<ResponseManageMemberDTO> login(RequestManageMemberDTO loginForm, HttpServletRequest request) {
         log.info("email = {} password = {}", loginForm.getEmail(), loginForm.getPassword());
         ManageMember loginMember = manageMemberRepository.findByEmailAndPassword(loginForm.getEmail(), loginForm.getPassword())
                 .orElseThrow(() -> new IllegalArgumentException("이메일 및 비밀번호가 맞지 않습니다."));
 
-        String[] sessionData = {loginMember.getName(), loginMember.getEmail()};
 
         HttpSession session = request.getSession(true);
+        String[] sessionData = {loginMember.getName(), loginMember.getEmail()};
         session.setAttribute(SESSION_KEY, sessionData);
 
-        return new ResponseManageMemberDTO(loginMember);
+        // Set-Cookie 헤더에 세션 ID 추가
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.SET_COOKIE, "JSESSIONID=" + session.getId() + "; Path=/; HttpOnly; Secure; SameSite=None");
+        ResponseManageMemberDTO dto = new ResponseManageMemberDTO(loginMember);
+
+        return new ResponseEntity<>(dto, httpHeaders, HttpStatus.OK);
     }
 
     public ResponseMessage logout(HttpServletRequest request, HttpServletResponse response) {
