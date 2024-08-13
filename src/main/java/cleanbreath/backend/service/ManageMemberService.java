@@ -9,6 +9,6 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 
 public interface ManageMemberService {
-    ResponseEntity<ResponseManageMemberDTO> login(RequestManageMemberDTO loginForm, HttpServletRequest request);
+    ResponseManageMemberDTO login(RequestManageMemberDTO loginForm, HttpServletRequest request);
     ResponseMessage logout(HttpServletRequest request, HttpServletResponse response);
 }
