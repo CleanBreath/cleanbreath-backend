@@ -28,7 +28,7 @@ public class ManageMemberServiceImpl implements ManageMemberService {
     private final ManageMemberRepository manageMemberRepository;
     private final static String SESSION_KEY = "ManageMember";
 
-    public ResponseEntity<ResponseManageMemberDTO> login(RequestManageMemberDTO loginForm, HttpServletRequest request) {
+    public ResponseManageMemberDTO login(RequestManageMemberDTO loginForm, HttpServletRequest request) {
         log.info("email = {} password = {}", loginForm.getEmail(), loginForm.getPassword());
         ManageMember loginMember = manageMemberRepository.findByEmailAndPassword(loginForm.getEmail(), loginForm.getPassword())
                 .orElseThrow(() -> new IllegalArgumentException("이메일 및 비밀번호가 맞지 않습니다."));
@@ -38,12 +38,7 @@ public class ManageMemberServiceImpl implements ManageMemberService {
         String[] sessionData = {loginMember.getName(), loginMember.getEmail()};
         session.setAttribute(SESSION_KEY, sessionData);
 
-        // Set-Cookie 헤더에 세션 ID 추가
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(HttpHeaders.SET_COOKIE, "JSESSIONID=" + session.getId() + "; Path=/; HttpOnly; Secure; SameSite=None");
-        ResponseManageMemberDTO dto = new ResponseManageMemberDTO(loginMember);
-
-        return new ResponseEntity<>(dto, httpHeaders, HttpStatus.OK);
+        return new ResponseManageMemberDTO(loginMember);
     }
 
     public ResponseMessage logout(HttpServletRequest request, HttpServletResponse response) {
