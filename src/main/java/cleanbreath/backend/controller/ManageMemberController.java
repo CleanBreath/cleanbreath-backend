@@ -19,16 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ManageMemberController {
     private final ManageMemberService manageMemberService;
 
-    @PostMapping("/manage/login")
-    public ResponseEntity<ResponseManageMemberDTO> login(@RequestBody RequestManageMemberDTO loginForm, HttpServletRequest request) {
-        ResponseManageMemberDTO result = manageMemberService.login(loginForm, request);
-
-        return ResponseEntity.ok(result);
-    }
-
-    @PostMapping("/manage/logout")
-    public ResponseEntity<ResponseMessage> logout(HttpServletRequest request, HttpServletResponse response) {
-        ResponseMessage logout = manageMemberService.logout(request, response);
-        return ResponseEntity.ok(logout);
+    @PostMapping("/verify")
+    public Object login(@RequestBody RequestManageMemberDTO request) {
+        return manageMemberService.verify(request);
     }
 }

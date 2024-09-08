@@ -6,11 +6,11 @@ import lombok.Setter;
 
 @Getter @Setter
 public class ResponseManageMemberDTO {
-    private String email;
-    private String name;
+    private String username;
+    private String token;
 
-    public ResponseManageMemberDTO(ManageMember manageMember) {
-        this.email = manageMember.getEmail();
-        this.name = manageMember.getName();
+    public ResponseManageMemberDTO(ManageMember manageMember, String token) {
+        this.username = manageMember.getUsername();
+        this.token = token;
     }
 }
