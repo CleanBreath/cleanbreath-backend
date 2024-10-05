@@ -36,6 +36,8 @@ public class ManageAddress {
     @Column(name = "m_address_category")
     private String addressCategory;
 
+
+
     @Builder.Default
     @OneToMany(mappedBy = "manageAddress", fetch = FetchType.LAZY, cascade = ALL)
     private List<SmokingAreaValidate> smokingAreaValidates = new ArrayList<>();

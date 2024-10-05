@@ -6,12 +6,14 @@ spring:
     import: optional:file:.env[.properties]
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/cleanbreath?serverTimezone=Asia/Seoul
-    username: root
-    password: Dnfltkfkd0306
-  #    url: jdbc:mysql://${DB_URL}/${DEFAULT_SCHEMA}?serverTimezone=Asia/Seoul
-#    username: ${DB_USERNAME}
-#    password: ${DB_PASSWORD}
+    # 테스트 용
+#    url: jdbc:mysql://localhost:3306/cleanbreath?serverTimezone=Asia/Seoul
+#    username: root
+#    password: Dnfltkfkd0306
+    # 릴리즈 용
+    url: jdbc:mysql://${DB_URL}/${DEFAULT_SCHEMA}?serverTimezone=Asia/Seoul
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   data:
     web:
       pageable:
@@ -30,5 +32,6 @@ spring:
         show_sql: false
         format_sql: false
 
-file.dir: ~/uploadFiles
+#file.dir: ~/uploadFiles
+file.dir: /home/daelim/cleanbreath-images
 secretKey: E603FD436E1F95A4970478E15B76D250F46F2503A27C3C7E3A5410735DABE32C

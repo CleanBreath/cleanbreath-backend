@@ -25,6 +25,8 @@ public class QManageMember extends EntityPathBase<ManageMember> {
 
     public final StringPath password = createString("password");
 
+    public final StringPath phone = createString("phone");
+
     public final EnumPath<Role> role = createEnum("role", Role.class);
 
     public final StringPath username = createString("username");

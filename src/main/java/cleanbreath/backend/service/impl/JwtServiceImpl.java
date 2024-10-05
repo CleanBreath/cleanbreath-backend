@@ -33,7 +33,7 @@ public class JwtServiceImpl implements JwtService {
                 .add(claims)
                 .subject(username)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 30))
+                .expiration(new Date(System.currentTimeMillis() + 30 * 60 * 1000)) // 30분
                 .and()
                 .signWith(getKey())
                 .compact();

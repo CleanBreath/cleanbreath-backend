@@ -22,9 +22,9 @@ public class AddressController {
 
     /**
      * 금연 및 흡연구역의 모든 정보를 반환한다.
-     * @apiNote 'server.bluesky-cleanbreath.com/v1/allData'
+     * @apiNote 'server.bluesky-cleanbreath.com/v1/allAddress'
      */
-    @GetMapping("/allData")
+    @GetMapping("/allAddress")
     public ResponseEntity<?> getAllAddresses() {
         List<ResponseAllAddressDTO> result = addressService.getAllAddresses();
         LocalDateTime updateAt = LocalDateTime.now();
@@ -34,9 +34,9 @@ public class AddressController {
 
     /**
      * 위도 및 경도 값을 받아서 일치하는 주소를 반환한다.
-     * @apiNote 'server.bluesky-cleanbreath.com/v1/data?lat=37.235634&lng=126.34264645'
+     * @apiNote 'server.bluesky-cleanbreath.com/v1/address?lat=37.235634&lng=126.34264645'
      */
-    @GetMapping("/data")
+    @GetMapping("/address")
     public ResponseEntity<ResponseAddressDTO> getAddress(@RequestParam("lat") Double lat, @RequestParam("lng") Double lng) {
         ResponseAddressDTO findAddress = addressService.getAddress(lat, lng);
         return ResponseEntity.ok(findAddress);

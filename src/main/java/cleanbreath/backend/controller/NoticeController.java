@@ -31,19 +31,19 @@ public class NoticeController {
         return ResponseEntity.ok(results);
     }
 
-    @PostMapping("/notice/add")
+    @PostMapping("/admin-v1/notice/add")
     public ResponseEntity<ResponseMessage> save(@RequestBody RequestNoticeDTO dto, HttpSession session) {
         ResponseMessage results = noticeService.save(dto, session);
         return ResponseEntity.ok(results);
     }
 
-    @PutMapping("/notice/{id}")
+    @PutMapping("/admin-v1/notice/{id}")
     public ResponseEntity<ResponseMessage> update(@PathVariable("id") Long id, @RequestBody RequestNoticeDTO dto, HttpSession session) {
         ResponseMessage results = noticeService.update(id, dto, session);
         return ResponseEntity.ok(results);
     }
 
-    @DeleteMapping("/notice/{id}")
+    @DeleteMapping("/admin-v1/notice/{id}")
     public ResponseEntity<ResponseMessage> delete(@PathVariable("id") Long id, HttpSession session) {
         ResponseMessage results = noticeService.delete(id, session);
         return ResponseEntity.ok(results);

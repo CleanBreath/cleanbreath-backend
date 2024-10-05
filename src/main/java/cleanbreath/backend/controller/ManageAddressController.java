@@ -19,13 +19,13 @@ public class ManageAddressController {
 
     private final ManageAddressService manageAddressService;
 
-    @GetMapping("/allRequestData")
+    @GetMapping("/allRequestAddress")
     public ResponseEntity<List<ResponseManageAddressDTO>> getAllRequestData(){
         List<ResponseManageAddressDTO> result = manageAddressService.getAllManageAddress();
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/allRequestDataPage")
+    @GetMapping("/allRequestAddressPage")
     public ResponseEntity<Page<ResponseManageAddressDTO>> getAllRequestDataPage(Pageable pageable){
         Page<ResponseManageAddressDTO> result = manageAddressService.GetPageAllManageAddress(pageable);
         return ResponseEntity.ok(result);

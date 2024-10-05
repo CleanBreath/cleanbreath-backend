@@ -17,7 +17,6 @@ import java.util.Collections;
 public class ManageMember implements UserDetails {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "m_id")
     private Long id;
 
     @Column(nullable = false, name = "m_name")
@@ -29,10 +28,12 @@ public class ManageMember implements UserDetails {
     @Column(nullable = false, name = "m_password")
     private String password;
 
+    @Column(name = "m_phone")
+    private String phone;
+
     @Column(nullable = false, name = "m_role")
     @Enumerated(EnumType.STRING)
     private Role role;
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
