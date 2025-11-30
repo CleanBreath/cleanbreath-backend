@@ -1,7 +1,7 @@
 package cleanbreath.backend.dto.AddressDTO;
 
 import cleanbreath.backend.dto.PathDTO.RequestPathDTO;
-import cleanbreath.backend.entity.manage.ManageAddress;
+import cleanbreath.backend.entity.pending.PendingAddress;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,8 +22,8 @@ public class RequestAddressDTO {
     private String category;
     private List<RequestPathDTO> paths;
 
-    public ManageAddress toEntity() {
-        return ManageAddress.builder()
+    public PendingAddress toEntity() {
+        return PendingAddress.builder()
                 .addressName(addressName)
                 .buildingName(buildingName)
                 .updateAt(updateAt)

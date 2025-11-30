@@ -5,10 +5,10 @@ import cleanbreath.backend.dto.AddressDTO.RequestUpdateAddressDTO;
 import cleanbreath.backend.dto.AddressDTO.ResponseMessage;
 import cleanbreath.backend.dto.Manage.AddressDTO.ResponseManageAddressDTO;
 import cleanbreath.backend.dto.PathDTO.RequestPathDTO;
-import cleanbreath.backend.entity.manage.ManageAddress;
-import cleanbreath.backend.entity.manage.ManagePath;
-import cleanbreath.backend.repository.manage.ManageAddressRepository;
-import cleanbreath.backend.repository.manage.ManagePathRepository;
+import cleanbreath.backend.entity.pending.PendingAddress;
+import cleanbreath.backend.entity.pending.ManagePath;
+import cleanbreath.backend.repository.pending.ManageAddressRepository;
+import cleanbreath.backend.repository.pending.PendingPathRepository;
 import cleanbreath.backend.service.ManageAddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,13 +25,13 @@ import java.util.List;
 public class ManageAddressServiceImpl implements ManageAddressService {
 
     private final ManageAddressRepository addressRepository;
-    private final ManagePathRepository pathRepository;
+    private final PendingPathRepository pathRepository;
 
     /**
      * 요청 받은 전체 데이터를 가져온다.
      */
     public List<ResponseManageAddressDTO> getAllManageAddress() {
-        List<ManageAddress> result = addressRepository.findAll();
+        List<PendingAddress> result = addressRepository.findAll();
         return result.stream()
                 .map(ResponseManageAddressDTO::new)
                 .toList();
@@ -61,7 +61,7 @@ public class ManageAddressServiceImpl implements ManageAddressService {
         if (!saveAddressValidate(addressDTO)) {
              return new ResponseMessage(HttpStatus.NOT_FOUND, "주소 및 영역 저장실패");
         }
-        ManageAddress saveAddress = addressDTO.toEntity();
+        PendingAddress saveAddress = addressDTO.toEntity();
         addressRepository.save(saveAddress);
 
         for (RequestPathDTO path : addressDTO.getPaths()) {
@@ -69,7 +69,7 @@ public class ManageAddressServiceImpl implements ManageAddressService {
                     .divisionArea(path.getDivisionArea())
                     .pathLat(path.getPathLat())
                     .pathLng(path.getPathLng())
-                    .manageAddress(saveAddress)
+                    .pendingAddress(saveAddress)
                     .build();
 
             pathRepository.save(savePath);
@@ -84,13 +84,13 @@ public class ManageAddressServiceImpl implements ManageAddressService {
      */
     @Transactional
     public ResponseMessage updateAddressData(Long id, RequestUpdateAddressDTO addressDTO) {
-        ManageAddress findManageAddress = addressRepository.findById(id)
+        PendingAddress findPendingAddress = addressRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 장소는 없습니다."));
 
         ManagePath findManagePath = pathRepository.findByManageAddressId(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 영역은 없습니다."));
 
-        findManageAddress.updateManageAddress(
+        findPendingAddress.updateManageAddress(
                 addressDTO.getAddressName(),
                 addressDTO.getBuildingName(),
                 addressDTO.getLatitude(),

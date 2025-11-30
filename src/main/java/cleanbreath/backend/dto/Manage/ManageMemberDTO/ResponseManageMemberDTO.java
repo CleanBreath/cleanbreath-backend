@@ -1,6 +1,5 @@
 package cleanbreath.backend.dto.Manage.ManageMemberDTO;
 
-import cleanbreath.backend.entity.manage.ManageMember;
 import lombok.Getter;
 import lombok.Setter;
 

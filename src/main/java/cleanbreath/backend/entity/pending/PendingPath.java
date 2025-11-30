@@ -1,4 +1,4 @@
-package cleanbreath.backend.entity.manage;
+package cleanbreath.backend.entity.pending;
 
 import cleanbreath.backend.entity.DivisionArea;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -9,14 +9,14 @@ import lombok.*;
 @Getter @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class ManagePath {
-    @Column(name = "m_path")
+public class PendingPath {
+    @Column(name = "u_path_id")
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "m_address_id") @JsonIgnore
-    private ManageAddress manageAddress;
+    @JoinColumn(name = "u_address_id") @JsonIgnore
+    private PendingAddress pendingAddress;
 
     @Column(name = "m_division_area")
     @Enumerated(EnumType.STRING)

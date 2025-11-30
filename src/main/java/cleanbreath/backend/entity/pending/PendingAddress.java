@@ -1,4 +1,4 @@
-package cleanbreath.backend.entity.manage;
+package cleanbreath.backend.entity.pending;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,38 +13,36 @@ import static jakarta.persistence.CascadeType.ALL;
 @Getter @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class ManageAddress {
-    @Column(name = "m_address_id")
+public class PendingAddress {
+    @Column(name = "u_address_id")
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "m_update_at")
+    @Column(name = "u_update_at")
     private LocalDateTime updateAt;
 
-    @Column(name = "m_address_name")
+    @Column(name = "u_address_name")
     private String addressName;
 
-    @Column(name = "m_building_name")
+    @Column(name = "u_building_name")
     private String buildingName;
 
-    @Column(name = "m_address_pos_lat")
+    @Column(name = "u_address_pos_lat")
     private Double addressPosLat;
 
-    @Column(name = "m_address_pos_lng")
+    @Column(name = "u_address_pos_lng")
     private Double addressPosLng;
 
-    @Column(name = "m_address_category")
+    @Column(name = "u_address_category")
     private String addressCategory;
 
-
+    @Builder.Default
+    @OneToMany(mappedBy = "pendingAddress", fetch = FetchType.LAZY, cascade = ALL)
+    private List<AreaValidationRequest> areaValidationRequests = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "manageAddress", fetch = FetchType.LAZY, cascade = ALL)
-    private List<SmokingAreaValidate> smokingAreaValidates = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "manageAddress", fetch = FetchType.LAZY, cascade = ALL)
-    private List<ManagePath> paths = new ArrayList<>();
+    @OneToMany(mappedBy = "pendingAddress", fetch = FetchType.LAZY, cascade = ALL)
+    private List<PendingPath> paths = new ArrayList<>();
 
     public void updateManageAddress(String addressName,
                                     String buildingName,

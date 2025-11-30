@@ -1,7 +1,7 @@
 package cleanbreath.backend.dto.Manage.PathDTO;
 
 import cleanbreath.backend.entity.DivisionArea;
-import cleanbreath.backend.entity.manage.ManagePath;
+import cleanbreath.backend.entity.pending.ManagePath;
 import lombok.Getter;
 import lombok.Setter;
 

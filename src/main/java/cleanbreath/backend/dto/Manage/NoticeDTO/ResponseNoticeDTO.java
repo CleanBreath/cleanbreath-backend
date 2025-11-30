@@ -1,6 +1,5 @@
 package cleanbreath.backend.dto.Manage.NoticeDTO;
 
-import cleanbreath.backend.entity.manage.Notice;
 import lombok.Getter;
 import lombok.Setter;
 
