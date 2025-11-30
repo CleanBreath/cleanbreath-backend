@@ -1,11 +1,10 @@
 package cleanbreath.backend.service;
 
-import cleanbreath.backend.dto.ApartmentDTO.ResponseAllApartmentDTO;
-import cleanbreath.backend.dto.ApartmentDTO.ResponseRegionApartmentDTO;
+import cleanbreath.backend.dto.ApartmentDto;
 
 import java.util.List;
 
 public interface ApartmentService {
-    List<ResponseAllApartmentDTO> getAllApartments();
-    List<ResponseRegionApartmentDTO> getRegionApartments(String region);
+    List<ApartmentDto.Response> getAllApartments();
+    List<ApartmentDto.Response> getRegionApartments(String region);
 }

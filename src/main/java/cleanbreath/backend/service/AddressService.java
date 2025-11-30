@@ -1,17 +1,14 @@
 package cleanbreath.backend.service;
 
-import cleanbreath.backend.dto.AddressDTO.*;
-import cleanbreath.backend.dto.ResponseAllDataUpdateCheckDTO;
+import cleanbreath.backend.dto.AddressDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AddressService {
-    List<ResponseAllAddressDTO> getAllAddresses();
-    Page<ResponseAllAddressDTO> getAllAddress(Pageable pageable);
-    ResponseAddressDTO getAddress(Double lat, Double lng);
-    Object updateAddress(RequestCheckUpdateAtDTO updateAtDTO);
+    List<AddressDto.ListResponse> getAllAddresses();
+    Page<AddressDto.ListResponse> getAllAddress(Pageable pageable);
+    AddressDto.Response getAddress(Double lat, Double lng);
+    Object updateAddress(AddressDto.CheckUpdate updateAtDTO);
 }

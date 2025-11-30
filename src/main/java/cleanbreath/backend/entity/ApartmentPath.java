@@ -43,8 +43,8 @@ public class ApartmentPath {
     @Column(name = "apartment_lng")
     private Double apartmentLng;
 
-    @Column(name = "paths_lat")
+    @Column(name = "paths_lat", columnDefinition = "LONGTEXT")
     private String pathsLat;
-    @Column(name = "paths_lng")
+    @Column(name = "paths_lng", columnDefinition = "LONGTEXT")
     private String pathsLng;
 }

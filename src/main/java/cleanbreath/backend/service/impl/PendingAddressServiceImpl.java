@@ -1,10 +1,8 @@
 package cleanbreath.backend.service.impl;
 
-import cleanbreath.backend.dto.AddressDTO.RequestAddressDTO;
-import cleanbreath.backend.dto.AddressDTO.RequestUpdateAddressDTO;
-import cleanbreath.backend.dto.AddressDTO.ResponseMessage;
-import cleanbreath.backend.dto.PathDTO.RequestPathDTO;
-import cleanbreath.backend.dto.Pending.AddressDTO.ResponsePendingAddressDTO;
+import cleanbreath.backend.dto.AddressDto;
+import cleanbreath.backend.dto.PendingDto;
+import cleanbreath.backend.dto.common.MessageResponse;
 import cleanbreath.backend.entity.pending.PendingAddress;
 import cleanbreath.backend.entity.pending.PendingPath;
 import cleanbreath.backend.repository.pending.PendingAddressRepository;
@@ -13,7 +11,7 @@ import cleanbreath.backend.service.PendingAddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,25 +28,28 @@ public class PendingAddressServiceImpl implements PendingAddressService {
     /**
      * 요청 받은 전체 데이터를 가져온다.
      */
-    public List<ResponsePendingAddressDTO> getAllManageAddress() {
+    public List<PendingDto.AddressResponse> getAllManageAddress() {
         List<PendingAddress> result = addressRepository.findAll();
         return result.stream()
-                .map(ResponsePendingAddressDTO::new)
+                .map(PendingDto.AddressResponse::new)
                 .toList();
     }
 
     /**
      * 요청 받은 전체 데이터를 가져온다.(페이징 시스템 추가)
      */
-    public Page<ResponsePendingAddressDTO> GetPageAllManageAddress(Pageable pageable) {
-        return addressRepository.findAll(pageable).map(ResponsePendingAddressDTO::new);
+    public PagedModel<PendingDto.AddressResponse> GetPageAllManageAddress(
+            Pageable pageable
+    ) {
+        Page<PendingDto.AddressResponse> list = addressRepository.findAll(pageable).map(PendingDto.AddressResponse::new);
+        return new PagedModel<>(list);
     }
 
     /**
      * 아이디 값을 받아서 해당 주소 정보를 가져온다.
      */
-    public ResponsePendingAddressDTO getManageAddressById(Long id) {
-        return addressRepository.findById(id).map(ResponsePendingAddressDTO::new).orElse(null);
+    public PendingDto.AddressResponse getManageAddressById(Long id) {
+        return addressRepository.findById(id).map(PendingDto.AddressResponse::new).orElse(null);
     }
 
     /**
@@ -56,14 +57,14 @@ public class PendingAddressServiceImpl implements PendingAddressService {
      * Client -> Pending Address
      */
     @Transactional
-    public ResponseMessage saveAddressData(RequestAddressDTO addressDTO) {
+    public MessageResponse saveAddressData(AddressDto.Request addressDTO) {
         if (!saveAddressValidate(addressDTO)) {
-             return new ResponseMessage(HttpStatus.NOT_FOUND, "주소 및 영역 저장실패");
+             return MessageResponse.of("주소 및 영역 저장실패");
         }
         PendingAddress saveAddress = addressDTO.toEntity();
         addressRepository.save(saveAddress);
 
-        for (RequestPathDTO path : addressDTO.getPaths()) {
+        for (AddressDto.PathRequest path : addressDTO.getPaths()) {
             PendingPath savePath = PendingPath.builder()
                     .divisionArea(path.getDivisionArea())
                     .pathLat(path.getPathLat())
@@ -74,7 +75,7 @@ public class PendingAddressServiceImpl implements PendingAddressService {
             pathRepository.save(savePath);
         }
 
-        return new ResponseMessage(HttpStatus.CREATED, "주소 및 영역 저장 성공");
+        return MessageResponse.of("주소 및 영역 저장 성공");
     }
 
     /**
@@ -82,7 +83,7 @@ public class PendingAddressServiceImpl implements PendingAddressService {
      * Client -> Pending Address
      */
     @Transactional
-    public ResponseMessage updateAddressData(Long id, RequestUpdateAddressDTO addressDTO) {
+    public MessageResponse updateAddressData(Long id, AddressDto.Update addressDTO) {
         PendingAddress findPendingAddress = addressRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 아이디를 가진 장소는 없습니다."));
 
@@ -97,27 +98,21 @@ public class PendingAddressServiceImpl implements PendingAddressService {
                 addressDTO.getCategory()
         );
 
-        findPendingPath.updatePath(
-                addressDTO.getPaths().getFirst().getDivisionArea(),
-                addressDTO.getPaths().getFirst().getPathLat(),
-                addressDTO.getPaths().getFirst().getPathLng()
-        );
-
-        return new ResponseMessage(HttpStatus.OK, "업데이트 성공");
+        return MessageResponse.of("업데이트 성공");
     }
     /**
      * 해당 주소 아이디를 받아 주소 및 영역 동시 삭제
      * Client -> Pending Address
      */
     @Transactional
-    public ResponseMessage deleteAddressDTO(Long id) {
+    public MessageResponse deleteAddressDTO(Long id) {
         addressRepository.deleteById(id);
         pathRepository.deleteByPendingAddress(id);
-        return new ResponseMessage(HttpStatus.OK, "해당 주소 및 영역 삭제 성공");
+        return MessageResponse.of("해당 주소 및 영역 삭제 성공");
     }
 
     // Save Address ValidateCheck
-    private boolean saveAddressValidate(RequestAddressDTO address) {
+    private boolean saveAddressValidate(AddressDto.Request address) {
         if (address.getAddressName().isEmpty() && address.getBuildingName().isEmpty()) {
             return false;
         }

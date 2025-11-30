@@ -1,12 +1,13 @@
 package cleanbreath.backend.controller;
 
-import cleanbreath.backend.dto.AddressDTO.RequestAddressDTO;
-import cleanbreath.backend.dto.AddressDTO.ResponseMessage;
-import cleanbreath.backend.dto.Pending.AddressDTO.ResponsePendingAddressDTO;
+import cleanbreath.backend.dto.AddressDto;
+import cleanbreath.backend.dto.PendingDto;
+import cleanbreath.backend.dto.common.MessageResponse;
 import cleanbreath.backend.service.PendingAddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,20 +21,20 @@ public class PendingAddressController {
     private final PendingAddressService pendingAddressService;
 
     @GetMapping("/allRequestAddress")
-    public ResponseEntity<List<ResponsePendingAddressDTO>> getAllRequestData(){
-        List<ResponsePendingAddressDTO> result = pendingAddressService.getAllManageAddress();
+    public ResponseEntity<List<PendingDto.AddressResponse>> getAllRequestData(){
+        List<PendingDto.AddressResponse> result = pendingAddressService.getAllManageAddress();
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/allRequestAddressPage")
-    public ResponseEntity<Page<ResponsePendingAddressDTO>> getAllRequestDataPage(Pageable pageable){
-        Page<ResponsePendingAddressDTO> result = pendingAddressService.GetPageAllManageAddress(pageable);
+    public ResponseEntity<PagedModel<PendingDto.AddressResponse>> getAllRequestDataPage(Pageable pageable){
+        PagedModel<PendingDto.AddressResponse> result = pendingAddressService.GetPageAllManageAddress(pageable);
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/smokingArea/add")
-    public ResponseEntity<ResponseMessage> addSmokingArea(@RequestBody RequestAddressDTO requestSmokingArea) {
-        ResponseMessage message = pendingAddressService.saveAddressData(requestSmokingArea);
+    public ResponseEntity<MessageResponse> addSmokingArea(@RequestBody AddressDto.Request requestSmokingArea) {
+        MessageResponse message = pendingAddressService.saveAddressData(requestSmokingArea);
         return ResponseEntity.ok(message);
     }
 }
