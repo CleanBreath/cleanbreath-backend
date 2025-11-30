@@ -38,6 +38,7 @@ public class Apartment {
     @Column(name = "designation_date")
     private LocalDate designationDate; // 지정 일자
 
+    @Builder.Default
     @OneToMany(mappedBy = "apartment", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ApartmentPath> apartmentPaths = new ArrayList<>();
 }
