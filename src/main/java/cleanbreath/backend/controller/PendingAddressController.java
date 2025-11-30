@@ -2,8 +2,8 @@ package cleanbreath.backend.controller;
 
 import cleanbreath.backend.dto.AddressDTO.RequestAddressDTO;
 import cleanbreath.backend.dto.AddressDTO.ResponseMessage;
-import cleanbreath.backend.dto.Manage.AddressDTO.ResponseManageAddressDTO;
-import cleanbreath.backend.service.ManageAddressService;
+import cleanbreath.backend.dto.Pending.AddressDTO.ResponsePendingAddressDTO;
+import cleanbreath.backend.service.PendingAddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,25 +15,25 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1")
-public class ManageAddressController {
+public class PendingAddressController {
 
-    private final ManageAddressService manageAddressService;
+    private final PendingAddressService pendingAddressService;
 
     @GetMapping("/allRequestAddress")
-    public ResponseEntity<List<ResponseManageAddressDTO>> getAllRequestData(){
-        List<ResponseManageAddressDTO> result = manageAddressService.getAllManageAddress();
+    public ResponseEntity<List<ResponsePendingAddressDTO>> getAllRequestData(){
+        List<ResponsePendingAddressDTO> result = pendingAddressService.getAllManageAddress();
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/allRequestAddressPage")
-    public ResponseEntity<Page<ResponseManageAddressDTO>> getAllRequestDataPage(Pageable pageable){
-        Page<ResponseManageAddressDTO> result = manageAddressService.GetPageAllManageAddress(pageable);
+    public ResponseEntity<Page<ResponsePendingAddressDTO>> getAllRequestDataPage(Pageable pageable){
+        Page<ResponsePendingAddressDTO> result = pendingAddressService.GetPageAllManageAddress(pageable);
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/smokingArea/add")
     public ResponseEntity<ResponseMessage> addSmokingArea(@RequestBody RequestAddressDTO requestSmokingArea) {
-        ResponseMessage message = manageAddressService.saveAddressData(requestSmokingArea);
+        ResponseMessage message = pendingAddressService.saveAddressData(requestSmokingArea);
         return ResponseEntity.ok(message);
     }
 }

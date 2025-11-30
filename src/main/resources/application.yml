@@ -9,6 +9,7 @@ spring:
     url: jdbc:mysql://${DB_HOSTNAME}/${DEFAULT_SCHEMA}?serverTimezone=Asia/Seoul
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
   data:
     web:
       pageable:
@@ -17,7 +18,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     properties:
       hibernate:
         show_sql: false

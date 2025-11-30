@@ -1,6 +1,6 @@
-package cleanbreath.backend.dto.Manage.AddressDTO;
+package cleanbreath.backend.dto.Pending.AddressDTO;
 
-import cleanbreath.backend.dto.Manage.PathDTO.ResponseManagePathDTO;
+import cleanbreath.backend.dto.Pending.PathDTO.ResponseManagePathDTO;
 import cleanbreath.backend.entity.pending.PendingAddress;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.util.List;
 
 @Getter @Setter
-public class ResponseManageAddressDTO {
+public class ResponsePendingAddressDTO {
     private Long id;
     private String addressName;
     private String buildingName;
@@ -17,7 +17,7 @@ public class ResponseManageAddressDTO {
     private String category;
     private List<ResponseManagePathDTO> paths;
 
-    public ResponseManageAddressDTO(PendingAddress pendingAddress) {
+    public ResponsePendingAddressDTO(PendingAddress pendingAddress) {
         this.id = pendingAddress.getId();
         this.addressName = pendingAddress.getAddressName();
         this.buildingName = pendingAddress.getBuildingName();
