@@ -81,6 +81,8 @@ DB_PASSWORD=your-password
 
 ### 애플리케이션 실행
 
+#### 로컬 실행
+
 ```bash
 # 빌드
 ./gradlew build
@@ -92,7 +94,94 @@ DB_PASSWORD=your-password
 java -jar build/libs/cleanbreath-backend-0.0.1-SNAPSHOT.jar
 ```
 
+#### Docker로 실행
+
+```bash
+# Docker 이미지 빌드
+docker build -t cleanbreath-backend .
+
+# Docker 컨테이너 실행
+docker run -p 8080:8080 \
+  -e DB_HOSTNAME=your-db-host \
+  -e DEFAULT_SCHEMA=your-db-name \
+  -e DB_USERNAME=your-username \
+  -e DB_PASSWORD=your-password \
+  cleanbreath-backend
+```
+
+#### Docker Compose로 실행
+
+```bash
+# 전체 스택 실행 (애플리케이션 + MySQL)
+docker-compose up -d
+
+# 로그 확인
+docker-compose logs -f
+
+# 중지
+docker-compose down
+```
+
+#### GitHub Container Registry에서 이미지 가져오기
+
+```bash
+# 이미지 pull
+docker pull ghcr.io/your-username/cleanbreath-backend:latest
+
+# 실행
+docker run -p 8080:8080 --env-file .env ghcr.io/your-username/cleanbreath-backend:latest
+```
+
 서버는 기본적으로 `http://localhost:8080`에서 실행됩니다.
+
+## 🚢 CI/CD
+
+### GitHub Actions Workflows
+
+프로젝트는 두 가지 Docker 이미지 빌드 워크플로우를 제공합니다:
+
+#### 1. GitHub Container Registry (GHCR)
+
+- **파일**: `.github/workflows/docker-build.yml`
+- **트리거**: `main`, `develop` 브랜치 push, PR, 태그 push
+- **자동 실행**: GitHub Token 사용 (별도 설정 불필요)
+- **이미지 위치**: `ghcr.io/your-username/cleanbreath-backend`
+
+#### 2. Docker Hub
+
+- **파일**: `.github/workflows/docker-hub.yml`
+- **트리거**: `main` 브랜치 push, 태그 push, 수동 실행
+- **필수 Secrets**:
+  - `DOCKER_USERNAME`: Docker Hub 사용자명
+  - `DOCKER_PASSWORD`: Docker Hub 액세스 토큰
+- **이미지 위치**: `cleanbreath/backend`
+
+### GitHub Secrets 설정
+
+Docker Hub 워크플로우를 사용하려면 다음 Secrets를 설정하세요:
+
+1. GitHub 저장소 → Settings → Secrets and variables → Actions
+2. New repository secret 클릭
+3. 다음 Secrets 추가:
+   - `DOCKER_USERNAME`: Docker Hub 사용자명
+   - `DOCKER_PASSWORD`: Docker Hub 액세스 토큰
+
+### 태그 기반 배포
+
+버전 태그를 푸시하면 자동으로 해당 버전의 이미지가 생성됩니다:
+
+```bash
+# 버전 태그 생성 및 푸시
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+생성되는 이미지 태그:
+
+- `v1.0.0`
+- `1.0`
+- `1`
+- `latest` (main 브랜치인 경우)
 
 ## 📚 API 문서
 
