@@ -35,7 +35,6 @@ public class FeedBackServiceImpl implements FeedbackService {
     public FeedbackDto.Response findFeedback(Long id) {
         Feedback findFeedback = feedbackRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 피드백은 존재하지 않습니다."));
-
         return new FeedbackDto.Response(findFeedback);
     }
 
@@ -53,16 +52,15 @@ public class FeedBackServiceImpl implements FeedbackService {
 
     @Transactional
     public MessageResponse deleteFeedback(Long id) {
+        if (!feedbackRepository.existsById(id)) {
+            throw new IllegalArgumentException("해당 피드백은 존재하지 않습니다.");
+        }
         feedbackRepository.deleteById(id);
-
         return MessageResponse.of("피드백 삭제 완료");
     }
 
-
     private boolean saveValidation(FeedbackDto.Create feedBackDTO) {
-        if (feedBackDTO.getTitle().isEmpty() && feedBackDTO.getContent().isEmpty()) {
-            return false;
-        }
-        return true;
+        return feedBackDTO.getTitle() != null && !feedBackDTO.getTitle().isEmpty() 
+            && feedBackDTO.getContent() != null && !feedBackDTO.getContent().isEmpty();
     }
 }

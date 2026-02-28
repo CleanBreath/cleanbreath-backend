@@ -24,7 +24,7 @@ public class AddressController {
      */
     @GetMapping("/allAddress")
     public ResponseEntity<?> getAllAddresses() {
-        List<AddressDto.ListResponse> result = addressService.getAllAddresses();
+        List<AddressDto.Response> result = addressService.getAllAddresses();
         LocalDateTime updateAt = LocalDateTime.now();
 
         return ResponseEntity.ok(ApiResponse.of(result.size(), updateAt, result));

@@ -9,8 +9,6 @@ import cleanbreath.backend.repository.PathRepository;
 import cleanbreath.backend.service.AddressService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,50 +18,40 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true) @Slf4j
+@Transactional(readOnly = true)
+@Slf4j
 public class AddressServiceImpl implements AddressService {
+    private static final long UPDATE_THRESHOLD_DAYS = 30;
+    
     private final AddressRepository addressRepository;
     private final PathRepository pathRepository;
 
-    // 전체 데이터 가져오기
-    public List<AddressDto.ListResponse> getAllAddresses() {
-        List<Address> findAddressList = addressRepository.findAll();
-
+    public List<AddressDto.Response> getAllAddresses() {
+        List<Address> findAddressList = addressRepository.findAllWithPaths();
         return findAddressList.stream()
-                .map(AddressDto.ListResponse::new)
+                .map(AddressDto.Response::new)
                 .toList();
     }
 
-    // 전체 데이터 가져오기 (페이징 시스템 추가된 버전)
-    public Page<AddressDto.ListResponse> getAllAddress(Pageable pageable) {
-        return addressRepository.findAll(pageable)
-                .map(AddressDto.ListResponse::new);
-    }
-
-    // 좌표값을 입력받아 해당 주소 가져오기
     public AddressDto.Response getAddress(Double lat, Double lng) {
         Address findAddress = addressRepository.findByAddressPosLatAndAddressPosLng(lat, lng)
-                .orElseThrow(() -> new RuntimeException("Address not found"));
-
+                .orElseThrow(() -> new IllegalArgumentException("Address not found"));
         return new AddressDto.Response(findAddress);
     }
 
-    // 주소 데이터 업데이트
     public Object updateAddress(AddressDto.CheckUpdate updateAtDTO) {
-        List<Address> result = addressRepository.findAll();
+        LocalDateTime currentDate = LocalDateTime.now();
+        LocalDateTime checkingUpdateAt = updateAtDTO.getUpdateDate();
+        long daysBetween = ChronoUnit.DAYS.between(checkingUpdateAt, currentDate);
+
+        if (daysBetween < UPDATE_THRESHOLD_DAYS) {
+            return MessageResponse.of("아직 업데이트 시기가 아닙니다.");
+        }
+        
+        List<Address> result = addressRepository.findAllWithPaths();
         List<AddressDto.Response> convertResult = result.stream()
                 .map(AddressDto.Response::new)
                 .toList();
-
-        LocalDateTime currentDate = LocalDateTime.now();
-
-        LocalDateTime checkingUpdateAt = updateAtDTO.getUpdateDate();
-        long daysBetween = ChronoUnit.DAYS.between(currentDate, checkingUpdateAt);
-
-        if (daysBetween >= 30) {
-            return ApiResponse.of(convertResult.size(), currentDate, convertResult);
-        } else {
-            return MessageResponse.of("아직 업데이트 시기가 아닙니다.");
-        }
+        return ApiResponse.of(convertResult.size(), currentDate, convertResult);
     }
 }

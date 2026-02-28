@@ -84,29 +84,6 @@ public class AddressDto {
     @Getter
     @Setter
     @NoArgsConstructor
-    public static class ListResponse {
-        private Long id;
-        private String addressName;
-        private String buildingName;
-        private Double latitude;
-        private Double longitude;
-        private String category;
-        private List<PathResponse> path;
-
-        public ListResponse(Address address) {
-            this.id = address.getId();
-            this.addressName = address.getAddressName();
-            this.buildingName = address.getBuildingName();
-            this.latitude = address.getAddressPosLat();
-            this.longitude = address.getAddressPosLng();
-            this.category = address.getAddressCategory();
-            this.path = address.getPaths().stream().map(PathResponse::new).toList();
-        }
-    }
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
     public static class PathRequest {
         private DivisionArea divisionArea;
         private String pathLat;
