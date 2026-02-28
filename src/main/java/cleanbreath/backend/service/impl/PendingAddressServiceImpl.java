@@ -25,41 +25,23 @@ public class PendingAddressServiceImpl implements PendingAddressService {
     private final PendingAddressRepository addressRepository;
     private final PendingPathRepository pathRepository;
 
-    /**
-     * 요청 받은 전체 데이터를 가져온다.
-     */
     public List<PendingDto.AddressResponse> getAllManageAddress() {
-        List<PendingAddress> result = addressRepository.findAll();
+        List<PendingAddress> result = addressRepository.findAllWithPaths();
         return result.stream()
                 .map(PendingDto.AddressResponse::new)
                 .toList();
     }
 
-    /**
-     * 요청 받은 전체 데이터를 가져온다.(페이징 시스템 추가)
-     */
-    public PagedModel<PendingDto.AddressResponse> GetPageAllManageAddress(
-            Pageable pageable
-    ) {
-        Page<PendingDto.AddressResponse> list = addressRepository.findAll(pageable).map(PendingDto.AddressResponse::new);
+    public PagedModel<PendingDto.AddressResponse> getPageAllManageAddress(Pageable pageable) {
+        Page<PendingDto.AddressResponse> list = addressRepository.findAll(pageable)
+                .map(PendingDto.AddressResponse::new);
         return new PagedModel<>(list);
     }
 
-    /**
-     * 아이디 값을 받아서 해당 주소 정보를 가져온다.
-     */
-    public PendingDto.AddressResponse getManageAddressById(Long id) {
-        return addressRepository.findById(id).map(PendingDto.AddressResponse::new).orElse(null);
-    }
-
-    /**
-     * 흡연구역의 주소 및 영역을 저장한다.
-     * Client -> Pending Address
-     */
     @Transactional
     public MessageResponse saveAddressData(AddressDto.Request addressDTO) {
         if (!saveAddressValidate(addressDTO)) {
-             return MessageResponse.of("주소 및 영역 저장실패");
+             return MessageResponse.of("주소 및 영역 저장 실패");
         }
         PendingAddress saveAddress = addressDTO.toEntity();
         addressRepository.save(saveAddress);
@@ -71,17 +53,12 @@ public class PendingAddressServiceImpl implements PendingAddressService {
                     .pathLng(path.getPathLng())
                     .pendingAddress(saveAddress)
                     .build();
-
             pathRepository.save(savePath);
         }
 
         return MessageResponse.of("주소 및 영역 저장 성공");
     }
 
-    /**
-     * 흡연구역 및 장소 영역을 업데이트 한다.
-     * Client -> Pending Address
-     */
     @Transactional
     public MessageResponse updateAddressData(Long id, AddressDto.Update addressDTO) {
         PendingAddress findPendingAddress = addressRepository.findById(id)
@@ -100,25 +77,22 @@ public class PendingAddressServiceImpl implements PendingAddressService {
 
         return MessageResponse.of("업데이트 성공");
     }
-    /**
-     * 해당 주소 아이디를 받아 주소 및 영역 동시 삭제
-     * Client -> Pending Address
-     */
+
     @Transactional
     public MessageResponse deleteAddressDTO(Long id) {
+        PendingAddress pendingAddress = addressRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 주소가 존재하지 않습니다."));
+        pathRepository.deleteByPendingAddress(pendingAddress);
         addressRepository.deleteById(id);
-        pathRepository.deleteByPendingAddress(id);
         return MessageResponse.of("해당 주소 및 영역 삭제 성공");
     }
 
-    // Save Address ValidateCheck
     private boolean saveAddressValidate(AddressDto.Request address) {
-        if (address.getAddressName().isEmpty() && address.getBuildingName().isEmpty()) {
-            return false;
-        }
-        if (address.getLatitude().isNaN() && address.getLongitude().isNaN()) {
-            return false;
-        }
-        return address.getUpdateAt() != null || !address.getCategory().isEmpty();
+        return address.getAddressName() != null && !address.getAddressName().isEmpty()
+            && address.getBuildingName() != null && !address.getBuildingName().isEmpty()
+            && address.getLatitude() != null && !address.getLatitude().isNaN()
+            && address.getLongitude() != null && !address.getLongitude().isNaN()
+            && address.getUpdateAt() != null
+            && address.getCategory() != null;
     }
 }
