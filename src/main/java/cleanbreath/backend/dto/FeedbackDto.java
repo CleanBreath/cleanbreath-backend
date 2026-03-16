@@ -1,6 +1,7 @@
 package cleanbreath.backend.dto;
 
 import cleanbreath.backend.entity.Feedback;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +14,10 @@ public class FeedbackDto {
     @Setter
     @NoArgsConstructor
     public static class Create {
+
+        @NotBlank
         private String title;
+        @NotBlank
         private String content;
 
         public Feedback toEntity() {
