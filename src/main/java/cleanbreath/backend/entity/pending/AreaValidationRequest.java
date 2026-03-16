@@ -9,6 +9,10 @@ import lombok.NoArgsConstructor;
 @Entity @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Table(name = "area_validation_request", indexes = {
+    // 외래키 인덱스 - PendingAddress 연관 조회 최적화
+    @Index(name = "idx_area_validation_address_id", columnList = "m_address_id")
+})
 public class AreaValidationRequest {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

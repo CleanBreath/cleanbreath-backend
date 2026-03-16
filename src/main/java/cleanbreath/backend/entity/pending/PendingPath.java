@@ -9,6 +9,10 @@ import lombok.*;
 @Getter @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Table(name = "pending_path", indexes = {
+    // 외래키 인덱스 - findByPendingAddress, deleteByPendingAddress 쿼리 최적화
+    @Index(name = "idx_pending_path_address_id", columnList = "u_address_id")
+})
 public class PendingPath {
     @Column(name = "u_path_id")
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
