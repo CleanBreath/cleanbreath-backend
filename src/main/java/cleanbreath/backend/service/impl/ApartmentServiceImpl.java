@@ -23,7 +23,7 @@ public class ApartmentServiceImpl implements ApartmentService {
      * stream과 mapd을 사용해 엔티티를 DTO로 변환해서 반환한다.
      */
     public List<ApartmentDto.Response> getAllApartments() {
-        return apartmentRepository.findAll()
+        return apartmentRepository.findAllWithPaths()
                 .stream()
                 .map(ApartmentDto.Response::new)
                 .toList();
