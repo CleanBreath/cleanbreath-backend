@@ -8,7 +8,10 @@ import lombok.*;
 @Getter @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "apartment_path")
+@Table(name = "apartment_path", indexes = {
+    // 외래키 인덱스 - Apartment JOIN FETCH 최적화
+    @Index(name = "idx_apartment_path_apartment_id", columnList = "apartment_id")
+})
 public class ApartmentPath {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "apartment_path_id")

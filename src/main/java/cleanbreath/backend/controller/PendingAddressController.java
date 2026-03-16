@@ -28,7 +28,7 @@ public class PendingAddressController {
 
     @GetMapping("/allRequestAddressPage")
     public ResponseEntity<PagedModel<PendingDto.AddressResponse>> getAllRequestDataPage(Pageable pageable){
-        PagedModel<PendingDto.AddressResponse> result = pendingAddressService.GetPageAllManageAddress(pageable);
+        PagedModel<PendingDto.AddressResponse> result = pendingAddressService.getPageAllManageAddress(pageable);
         return ResponseEntity.ok(result);
     }
 

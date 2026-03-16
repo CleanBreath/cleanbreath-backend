@@ -10,7 +10,10 @@ import java.util.List;
 @Entity
 @Getter @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "apartment")
+@Table(name = "apartment", indexes = {
+    // 지역별 아파트 조회 인덱스 - findByRegion 쿼리 최적화
+    @Index(name = "idx_apartment_region", columnList = "region")
+})
 @AllArgsConstructor
 public class Apartment {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

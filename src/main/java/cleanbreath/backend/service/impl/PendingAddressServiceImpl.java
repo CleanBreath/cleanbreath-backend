@@ -5,6 +5,8 @@ import cleanbreath.backend.dto.PendingDto;
 import cleanbreath.backend.dto.common.MessageResponse;
 import cleanbreath.backend.entity.pending.PendingAddress;
 import cleanbreath.backend.entity.pending.PendingPath;
+import cleanbreath.backend.exception.BusinessException;
+import cleanbreath.backend.exception.ErrorCode;
 import cleanbreath.backend.repository.pending.PendingAddressRepository;
 import cleanbreath.backend.repository.pending.PendingPathRepository;
 import cleanbreath.backend.service.PendingAddressService;
@@ -25,70 +27,53 @@ public class PendingAddressServiceImpl implements PendingAddressService {
     private final PendingAddressRepository addressRepository;
     private final PendingPathRepository pathRepository;
 
-    /**
-     * 요청 받은 전체 데이터를 가져온다.
-     */
     public List<PendingDto.AddressResponse> getAllManageAddress() {
-        List<PendingAddress> result = addressRepository.findAll();
-        return result.stream()
+        return addressRepository.findAllWithPaths()
+                .stream()
                 .map(PendingDto.AddressResponse::new)
                 .toList();
     }
 
-    /**
-     * 요청 받은 전체 데이터를 가져온다.(페이징 시스템 추가)
-     */
-    public PagedModel<PendingDto.AddressResponse> GetPageAllManageAddress(
-            Pageable pageable
-    ) {
-        Page<PendingDto.AddressResponse> list = addressRepository.findAll(pageable).map(PendingDto.AddressResponse::new);
-        return new PagedModel<>(list);
+    public PagedModel<PendingDto.AddressResponse> getPageAllManageAddress(Pageable pageable) {
+        Page<PendingDto.AddressResponse> page = addressRepository.findAll(pageable)
+                .map(PendingDto.AddressResponse::new);
+        return new PagedModel<>(page);
     }
 
-    /**
-     * 아이디 값을 받아서 해당 주소 정보를 가져온다.
-     */
     public PendingDto.AddressResponse getManageAddressById(Long id) {
-        return addressRepository.findById(id).map(PendingDto.AddressResponse::new).orElse(null);
+        return addressRepository.findById(id)
+                .map(PendingDto.AddressResponse::new)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PENDING_ADDRESS_NOT_FOUND));
     }
 
-    /**
-     * 흡연구역의 주소 및 영역을 저장한다.
-     * Client -> Pending Address
-     */
     @Transactional
     public MessageResponse saveAddressData(AddressDto.Request addressDTO) {
-        if (!saveAddressValidate(addressDTO)) {
-             return MessageResponse.of("주소 및 영역 저장실패");
-        }
-        PendingAddress saveAddress = addressDTO.toEntity();
-        addressRepository.save(saveAddress);
+        validateSaveRequest(addressDTO);
 
-        for (AddressDto.PathRequest path : addressDTO.getPaths()) {
-            PendingPath savePath = PendingPath.builder()
-                    .divisionArea(path.getDivisionArea())
-                    .pathLat(path.getPathLat())
-                    .pathLng(path.getPathLng())
-                    .pendingAddress(saveAddress)
-                    .build();
+        PendingAddress savedAddress = addressRepository.save(addressDTO.toEntity());
 
-            pathRepository.save(savePath);
-        }
+        // N번 세이브 대신에 saveAll() 한 번에 처리
+        List<PendingPath> pendingPaths = addressDTO.getPaths().stream()
+                .map(path -> PendingPath.builder()
+                        .divisionArea(path.getDivisionArea())
+                        .pathLat(path.getPathLat())
+                        .pathLng(path.getPathLng())
+                        .pendingAddress(savedAddress)
+                        .build())
+                .toList();
+
+        pathRepository.saveAll(pendingPaths);
 
         return MessageResponse.of("주소 및 영역 저장 성공");
     }
 
-    /**
-     * 흡연구역 및 장소 영역을 업데이트 한다.
-     * Client -> Pending Address
-     */
     @Transactional
     public MessageResponse updateAddressData(Long id, AddressDto.Update addressDTO) {
         PendingAddress findPendingAddress = addressRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 아이디를 가진 장소는 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.PENDING_ADDRESS_NOT_FOUND));
 
         PendingPath findPendingPath = pathRepository.findByPendingAddress(findPendingAddress)
-                .orElseThrow(() -> new IllegalArgumentException("해당 영역은 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.PENDING_PATH_NOT_FOUND));
 
         findPendingAddress.updateManageAddress(
                 addressDTO.getAddressName(),
@@ -100,25 +85,28 @@ public class PendingAddressServiceImpl implements PendingAddressService {
 
         return MessageResponse.of("업데이트 성공");
     }
-    /**
-     * 해당 주소 아이디를 받아 주소 및 영역 동시 삭제
-     * Client -> Pending Address
-     */
+
     @Transactional
-    public MessageResponse deleteAddressDTO(Long id) {
-        addressRepository.deleteById(id);
-        pathRepository.deleteByPendingAddress(id);
+    public MessageResponse deleteAddressData(Long id) {
+        PendingAddress findPendingAddress = addressRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PENDING_ADDRESS_NOT_FOUND));
+
+        // 엔티티 전달하여 타입 불일치 문제 해결
+        pathRepository.deleteByPendingAddress(findPendingAddress);
+        addressRepository.delete(findPendingAddress);
+
         return MessageResponse.of("해당 주소 및 영역 삭제 성공");
     }
 
-    // Save Address ValidateCheck
-    private boolean saveAddressValidate(AddressDto.Request address) {
-        if (address.getAddressName().isEmpty() && address.getBuildingName().isEmpty()) {
-            return false;
+    private void validateSaveRequest(AddressDto.Request address) {
+        if (address.getAddressName().isBlank() || address.getBuildingName().isBlank()) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
         }
-        if (address.getLatitude().isNaN() && address.getLongitude().isNaN()) {
-            return false;
+        if (address.getLatitude() == null || address.getLongitude() == null) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
         }
-        return address.getUpdateAt() != null || !address.getCategory().isEmpty();
+        if (address.getUpdateAt() == null || address.getCategory().isBlank()) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
+        }
     }
 }

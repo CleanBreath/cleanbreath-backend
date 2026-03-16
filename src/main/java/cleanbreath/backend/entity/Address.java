@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "address")
+@Table(name = "address", indexes = {
+    // 위도/경도 복합 인덱스 - findByAddressPosLatAndAddressPosLng 쿼리 최적화
+    @Index(name = "idx_address_lat_lng", columnList = "address_pos_lat, address_pos_lng")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor @Builder

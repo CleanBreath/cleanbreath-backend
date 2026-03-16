@@ -10,8 +10,16 @@ import org.springframework.data.web.PagedModel;
 import java.util.List;
 
 public interface PendingAddressService {
+
     List<PendingDto.AddressResponse> getAllManageAddress();
-    PagedModel<PendingDto.AddressResponse> GetPageAllManageAddress(Pageable pageable);
+
+    PagedModel<PendingDto.AddressResponse> getPageAllManageAddress(Pageable pageable);
+
     PendingDto.AddressResponse getManageAddressById(Long id);
+
     MessageResponse saveAddressData(AddressDto.Request addressDTO);
+
+    MessageResponse updateAddressData(Long id, AddressDto.Update addressDTO);
+
+    MessageResponse deleteAddressData(Long id);
 }

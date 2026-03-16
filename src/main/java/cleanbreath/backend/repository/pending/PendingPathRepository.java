@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface PendingPathRepository extends JpaRepository<PendingPath, Long> {
     Optional<PendingPath> findByPendingAddress(PendingAddress address);
-    void deleteByPendingAddress(Long id);
+    void deleteByPendingAddress(PendingAddress pendingAddress);
 }

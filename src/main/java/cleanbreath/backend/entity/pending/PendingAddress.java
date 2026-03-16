@@ -13,6 +13,7 @@ import static jakarta.persistence.CascadeType.ALL;
 @Getter @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Table(name = "pending_address")
 public class PendingAddress {
     @Column(name = "u_address_id")
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -5,7 +5,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "path")
+@Table(name = "path", indexes = {
+    // 외래키 인덱스 - findByAddressId 및 JOIN FETCH 최적화
+    @Index(name = "idx_path_address_id", columnList = "address_id")
+})
 @Getter @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

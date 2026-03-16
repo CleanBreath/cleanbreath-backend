@@ -2,6 +2,8 @@ package cleanbreath.backend.service.impl;
 
 import cleanbreath.backend.dto.ApartmentDto;
 import cleanbreath.backend.entity.Apartment;
+import cleanbreath.backend.exception.BusinessException;
+import cleanbreath.backend.exception.ErrorCode;
 import cleanbreath.backend.repository.ApartmentRepository;
 import cleanbreath.backend.service.ApartmentService;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +23,10 @@ public class ApartmentServiceImpl implements ApartmentService {
      * stream과 mapd을 사용해 엔티티를 DTO로 변환해서 반환한다.
      */
     public List<ApartmentDto.Response> getAllApartments() {
-        List<Apartment> result = apartmentRepository.findAll();
-
-        return result.stream().map(ApartmentDto.Response::new).toList();
+        return apartmentRepository.findAllWithPaths()
+                .stream()
+                .map(ApartmentDto.Response::new)
+                .toList();
     }
 
     /**
@@ -31,11 +34,15 @@ public class ApartmentServiceImpl implements ApartmentService {
      * 위와 마찬가지로 엔티티를 DTO로 변환하여 반환한다.
      */
     public List<ApartmentDto.Response> getRegionApartments(String region) {
-        List<Apartment> result = apartmentRepository.findByRegion(region);
+        List<ApartmentDto.Response> result = apartmentRepository.findByRegion(region)
+                .stream()
+                .map(ApartmentDto.Response::new)
+                .toList();
+
         if (result.isEmpty()) {
-            throw new IllegalArgumentException("해당 지역은 없는 지역입니다.");
+            throw new BusinessException(ErrorCode.REGION_NOT_FOUND);
         }
 
-        return result.stream().map(ApartmentDto.Response::new).toList();
+        return result;
     }
 }
