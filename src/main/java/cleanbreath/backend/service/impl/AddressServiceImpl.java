@@ -2,10 +2,12 @@ package cleanbreath.backend.service.impl;
 
 import cleanbreath.backend.dto.AddressDto;
 import cleanbreath.backend.dto.common.ApiResponse;
+import cleanbreath.backend.dto.common.BaseResponse;
 import cleanbreath.backend.dto.common.MessageResponse;
 import cleanbreath.backend.entity.Address;
+import cleanbreath.backend.exception.BusinessException;
+import cleanbreath.backend.exception.ErrorCode;
 import cleanbreath.backend.repository.AddressRepository;
-import cleanbreath.backend.repository.PathRepository;
 import cleanbreath.backend.service.AddressService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,11 +37,11 @@ public class AddressServiceImpl implements AddressService {
 
     public AddressDto.Response getAddress(Double lat, Double lng) {
         Address findAddress = addressRepository.findByAddressPosLatAndAddressPosLng(lat, lng)
-                .orElseThrow(() -> new IllegalArgumentException("Address not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.ADDRESS_NOT_FOUND));
         return new AddressDto.Response(findAddress);
     }
 
-    public Object updateAddress(AddressDto.CheckUpdate updateAtDTO) {
+    public BaseResponse updateAddress(AddressDto.CheckUpdate updateAtDTO) {
         LocalDateTime currentDate = LocalDateTime.now();
         LocalDateTime checkingUpdateAt = updateAtDTO.getUpdateDate();
         long daysBetween = ChronoUnit.DAYS.between(checkingUpdateAt, currentDate);

@@ -73,7 +73,7 @@ public class PendingAddressServiceImpl implements PendingAddressService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.PENDING_ADDRESS_NOT_FOUND));
 
         PendingPath findPendingPath = pathRepository.findByPendingAddress(findPendingAddress)
-                .orElseThrow(() -> new IllegalArgumentException("해당 영역은 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.PENDING_PATH_NOT_FOUND));
 
         findPendingAddress.updateManageAddress(
                 addressDTO.getAddressName(),

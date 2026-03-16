@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-public class ApiResponse<T> {
+public class ApiResponse<T> implements BaseResponse {
     private int count;
     private LocalDateTime updateAt;
     private T data;
