@@ -18,7 +18,7 @@ public class FeedbackController {
 
     // 전체 피드백 데이터 가져오기
     @GetMapping("/feedback-list")
-    public ResponseEntity<List<FeedbackDto.ListResponse>> FeedbackList() {
+    public ResponseEntity<List<FeedbackDto.ListResponse>> getFeedbackList() {
         List<FeedbackDto.ListResponse> result = feedbackService.findAllFeedback();
         return ResponseEntity.ok(result);
     }

@@ -24,7 +24,7 @@ public class AddressServiceImpl implements AddressService {
     private static final long UPDATE_THRESHOLD_DAYS = 30;
     
     private final AddressRepository addressRepository;
-    private final PathRepository pathRepository;
+//    private final PathRepository pathRepository;
 
     public List<AddressDto.Response> getAllAddresses() {
         List<Address> findAddressList = addressRepository.findAllWithPaths();
