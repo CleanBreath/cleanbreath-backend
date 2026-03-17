@@ -32,6 +32,20 @@ public class PendingAddressController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/smokingArea/{id}")
+    public ResponseEntity<PendingDto.DetailResponse> getAreaDetail(@PathVariable Long id) {
+        PendingDto.DetailResponse result = pendingAddressService.getAddressDetail(id);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/smokingArea/{id}/vote")
+    public ResponseEntity<MessageResponse> voteArea(
+            @PathVariable Long id,
+            @RequestBody PendingDto.ValidationVoteRequest request) {
+        MessageResponse message = pendingAddressService.vote(id, request);
+        return ResponseEntity.ok(message);
+    }
+
     @PostMapping("/smokingArea/add")
     public ResponseEntity<MessageResponse> addSmokingArea(@RequestBody AddressDto.Request requestSmokingArea) {
         MessageResponse message = pendingAddressService.saveAddressData(requestSmokingArea);

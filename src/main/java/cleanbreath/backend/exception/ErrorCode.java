@@ -20,7 +20,8 @@ public enum ErrorCode {
     FEEDBACK_INVALID("피드백 제목 또는 내용이 비어있습니다.", HttpStatus.BAD_REQUEST),
 
     // 공통
-    INVALID_INPUT("잘못된 입력값입니다.", HttpStatus.BAD_REQUEST);
+    INVALID_INPUT("잘못된 입력값입니다.", HttpStatus.BAD_REQUEST),
+    DUPLICATE_VALIDATION_REQUEST("이미 해당 대상에 대한 검증 요청이 존재합니다.", HttpStatus.CONFLICT);
 
     private final String message;
     private final HttpStatus status;
