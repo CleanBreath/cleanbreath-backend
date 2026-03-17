@@ -3,12 +3,14 @@ package cleanbreath.backend.service.impl;
 import cleanbreath.backend.dto.AddressDto;
 import cleanbreath.backend.dto.PendingDto;
 import cleanbreath.backend.dto.common.MessageResponse;
+import cleanbreath.backend.entity.pending.AreaValidationRequest;
 import cleanbreath.backend.entity.pending.PendingAddress;
 import cleanbreath.backend.entity.pending.PendingPath;
 import cleanbreath.backend.exception.BusinessException;
 import cleanbreath.backend.exception.ErrorCode;
 import cleanbreath.backend.repository.pending.PendingAddressRepository;
 import cleanbreath.backend.repository.pending.PendingPathRepository;
+import cleanbreath.backend.repository.pending.SmokingAreaValidateRepository;
 import cleanbreath.backend.service.PendingAddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +28,7 @@ public class PendingAddressServiceImpl implements PendingAddressService {
 
     private final PendingAddressRepository addressRepository;
     private final PendingPathRepository pathRepository;
+    private final SmokingAreaValidateRepository validationRepository;
 
     public List<PendingDto.AddressResponse> getAllManageAddress() {
         return addressRepository.findAllWithPaths()
@@ -44,6 +47,40 @@ public class PendingAddressServiceImpl implements PendingAddressService {
         return addressRepository.findById(id)
                 .map(PendingDto.AddressResponse::new)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PENDING_ADDRESS_NOT_FOUND));
+    }
+
+    public PendingDto.DetailResponse getAddressDetail(Long id) {
+        PendingAddress pendingAddress = addressRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PENDING_ADDRESS_NOT_FOUND));
+
+        int truthCount = validationRepository.sumTruthByPendingAddressId(id);
+        int untruthCount = validationRepository.sumUntruthByPendingAddressId(id);
+
+        return new PendingDto.DetailResponse(pendingAddress, truthCount, untruthCount);
+    }
+
+    @Transactional
+    public MessageResponse vote(Long addressId, PendingDto.ValidationVoteRequest request) {
+        // 중복 투표 방지 (client_token + target_id UNIQUE)
+        if (validationRepository.existsByClientTokenAndTargetId(
+                request.getClientToken(), addressId)) {
+            throw new BusinessException(ErrorCode.DUPLICATE_VALIDATION_REQUEST);
+        }
+
+        PendingAddress pendingAddress = addressRepository.findById(addressId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PENDING_ADDRESS_NOT_FOUND));
+
+        AreaValidationRequest validationRequest = AreaValidationRequest.builder()
+                .pendingAddress(pendingAddress)
+                .clientToken(request.getClientToken())
+                .targetId(addressId)
+                .truth(request.isTruth() ? 1 : 0)
+                .untruth(request.isTruth() ? 0 : 1)
+                .build();
+
+        validationRepository.save(validationRequest);
+
+        return MessageResponse.of("투표가 완료되었습니다.");
     }
 
     @Transactional

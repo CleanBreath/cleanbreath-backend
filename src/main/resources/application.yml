@@ -22,3 +22,20 @@ spring:
       hibernate:
         show_sql: false
         format_sql: false
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+
+batch:
+  promotion:
+    threshold: 20 # 임계값 20으로 수정
+    cron: "0 0 3 * * *"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, monitoring, metrics
