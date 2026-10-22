@@ -5,6 +5,7 @@ import cleanbreath.backend.entity.DivisionArea;
 import cleanbreath.backend.entity.Path;
 import cleanbreath.backend.entity.pending.PendingAddress;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -55,6 +56,7 @@ public class AddressDto {
     @Setter
     @NoArgsConstructor
     public static class CheckUpdate {
+        @NotNull
         private LocalDateTime updateDate;
     }
 
