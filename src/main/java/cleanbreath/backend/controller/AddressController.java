@@ -3,6 +3,7 @@ package cleanbreath.backend.controller;
 import cleanbreath.backend.dto.AddressDto;
 import cleanbreath.backend.dto.common.ApiResponse;
 import cleanbreath.backend.service.AddressService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,7 @@ public class AddressController {
      * @apiNote '/v1/updateDate
      */
     @PostMapping("/updateDate")
-    public ResponseEntity<?> updateAddress(@RequestBody AddressDto.CheckUpdate updateAtDTO) {
+    public ResponseEntity<?> updateAddress(@Valid @RequestBody AddressDto.CheckUpdate updateAtDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(addressService.updateAddress(updateAtDTO));
     }
 }

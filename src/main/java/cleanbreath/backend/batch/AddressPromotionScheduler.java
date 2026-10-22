@@ -22,8 +22,8 @@ public class AddressPromotionScheduler {
   private final JobOperator jobOperator;
   private final Job addressPromotionJob;
 
-  // 매일 새벽 3시 실행
-  @Scheduled(cron = "${batch.promotion.cron:0 0 3 * * *}")
+  // 매일 새벽 3시(KST) 실행 - 컨테이너가 UTC라 zone을 명시
+  @Scheduled(cron = "${batch.promotion.cron:0 0 3 * * *}", zone = "Asia/Seoul")
   public void runPromotionBatch() {
     try {
       // 매 실행마다 고유한 JobParameters 생성

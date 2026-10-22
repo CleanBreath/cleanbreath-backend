@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CleanBreath EC2 instance profile for AWS Systems Manager Session Manager access
+
+Resources:
+  SsmRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: Lets the CleanBreath EC2 instance register as an SSM managed node
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Tags:
+        - Key: Project
+          Value: CleanBreath
+
+  SsmInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref SsmRole
+
+Outputs:
+  InstanceProfileArn:
+    Value: !GetAtt SsmInstanceProfile.Arn
+  InstanceProfileName:
+    Value: !Ref SsmInstanceProfile
