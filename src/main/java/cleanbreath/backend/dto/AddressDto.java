@@ -33,7 +33,8 @@ public class AddressDto {
             return PendingAddress.builder()
                     .addressName(addressName)
                     .buildingName(buildingName)
-                    .updateAt(updateAt)
+                    // 보관 기간 계산 기준이라 클라이언트 값 대신 서버 시각을 사용
+                    .updateAt(LocalDateTime.now())
                     .addressPosLat(latitude)
                     .addressPosLng(longitude)
                     .addressCategory(category)

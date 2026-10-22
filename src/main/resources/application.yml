@@ -39,6 +39,8 @@ batch:
   promotion:
     threshold: 20 # 임계값 20으로 수정
     cron: "0 0 3 * * *"
+  retention:
+    cron: "0 30 3 * * *"
 
 management:
   endpoints:

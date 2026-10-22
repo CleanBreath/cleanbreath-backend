@@ -350,6 +350,10 @@ GET /v1/region?r={region}
 
 ### 💬 Feedback API (피드백)
 
+> 피드백 등록(`POST /v1/feedback/add`)을 뺀 목록·상세·수정·삭제는 관리자 전용입니다.
+> `Authorization: Bearer <ADMIN_TOKEN>` 헤더가 없거나 틀리면 401을 반환합니다.
+> 피드백은 접수 후 1년, 승인되지 않은 구역 요청은 등록 후 6개월이 지나면 매일 새벽 3시 30분(KST)에 자동 파기됩니다.
+
 #### 1. 피드백 목록 조회
 
 ```http
