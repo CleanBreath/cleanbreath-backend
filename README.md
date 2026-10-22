@@ -77,6 +77,8 @@ DB_HOSTNAME=your-database-host
 DEFAULT_SCHEMA=your-database-name
 DB_USERNAME=your-username
 DB_PASSWORD=your-password
+# 선택: CORS 허용 출처(쉼표 구분). 미설정 시 운영 도메인만 허용
+# 로컬 프론트엔드 개발 시 예: CORS_ALLOWED_ORIGINS=http://localhost:3000,https://cleanbreath.cmu02-studio.com
 ```
 
 ### 애플리케이션 실행
