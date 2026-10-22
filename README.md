@@ -79,6 +79,9 @@ DB_USERNAME=your-username
 DB_PASSWORD=your-password
 # 선택: CORS 허용 출처(쉼표 구분). 미설정 시 운영 도메인만 허용
 # 로컬 프론트엔드 개발 시 예: CORS_ALLOWED_ORIGINS=http://localhost:3000,https://cleanbreath.cmu02-studio.com
+# 피드백 조회·수정·삭제 API용 관리자 토큰. 미설정 시 해당 API는 모두 401
+# 생성 예: openssl rand -hex 32
+ADMIN_TOKEN=your-admin-token
 ```
 
 ### 애플리케이션 실행
