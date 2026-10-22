@@ -79,6 +79,9 @@ DB_USERNAME=your-username
 DB_PASSWORD=your-password
 # 선택: CORS 허용 출처(쉼표 구분). 미설정 시 운영 도메인만 허용
 # 로컬 프론트엔드 개발 시 예: CORS_ALLOWED_ORIGINS=http://localhost:3000,https://cleanbreath.cmu02-studio.com
+# 피드백 조회·수정·삭제 API용 관리자 토큰. 미설정 시 해당 API는 모두 401
+# 생성 예: openssl rand -hex 32
+ADMIN_TOKEN=your-admin-token
 ```
 
 ### 애플리케이션 실행
@@ -346,6 +349,10 @@ GET /v1/region?r={region}
 ---
 
 ### 💬 Feedback API (피드백)
+
+> 피드백 등록(`POST /v1/feedback/add`)을 뺀 목록·상세·수정·삭제는 관리자 전용입니다.
+> `Authorization: Bearer <ADMIN_TOKEN>` 헤더가 없거나 틀리면 401을 반환합니다.
+> 피드백은 접수 후 1년, 승인되지 않은 구역 요청은 등록 후 6개월이 지나면 매일 새벽 3시 30분(KST)에 자동 파기됩니다.
 
 #### 1. 피드백 목록 조회
 

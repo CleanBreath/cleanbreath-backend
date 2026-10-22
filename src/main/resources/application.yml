@@ -32,10 +32,15 @@ spring:
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:https://cleanbreath.cmu02-studio.com}
 
+admin:
+  token: ${ADMIN_TOKEN:}
+
 batch:
   promotion:
     threshold: 20 # 임계값 20으로 수정
     cron: "0 0 3 * * *"
+  retention:
+    cron: "0 30 3 * * *"
 
 management:
   endpoints:
