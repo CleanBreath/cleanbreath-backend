@@ -18,12 +18,15 @@ public interface PendingAddressRepository extends JpaRepository<PendingAddress, 
     List<PendingAddress> findByUpdateAtBefore(LocalDateTime cutoff);
 
     // 검증 투표(truth) 합계가 임계값 이상인 PendingAddress 조회 (배치용)
+    // 합계는 서브쿼리에서 구한다: paths를 함께 GROUP BY하면 only_full_group_by에서 실패하고, 경로 수만큼 합계가 부풀려진다
     @Query("""
         SELECT DISTINCT pa FROM PendingAddress pa
         LEFT JOIN FETCH pa.paths
-        JOIN pa.areaValidationRequests avr
-        GROUP BY pa
-        HAVING SUM(avr.truth) >= :threshold
+        WHERE pa.id IN (
+            SELECT avr.pendingAddress.id FROM AreaValidationRequest avr
+            GROUP BY avr.pendingAddress.id
+            HAVING SUM(avr.truth) >= :threshold
+        )
     """)
     List<PendingAddress> findAddressesMeetingThreshold(@Param("threshold") int threshold);
 }
