@@ -36,6 +36,36 @@ class PathTest {
   }
 
   @Test
+  @DisplayName("끝에 겹쳐 찍힌 점과 시작점 바로 옆의 닫는 클릭을 지운다 (운영 path 4의 실제 좌표)")
+  void nearDuplicateTail_isRemoved() {
+    Path.Coordinates cleaned = Path.removeNearDuplicatePoints(
+        "37.40015614313889,37.39986535945584,37.399764067768196,37.40007511919417,37.400153887349575,37.400153887349575",
+        "126.93221376743796,126.93185827163431,126.93198541950272,126.9323324266534,126.93220812250028,126.93220812250028");
+
+    assertThat(cleaned.pathLat()).isEqualTo("37.40015614313889,37.39986535945584,37.399764067768196,37.40007511919417");
+    assertThat(cleaned.pathLng()).isEqualTo("126.93221376743796,126.93185827163431,126.93198541950272,126.9323324266534");
+  }
+
+  @Test
+  @DisplayName("중간에 0.25m 간격으로 붙은 점을 지운다 (운영 path 58의 실제 좌표)")
+  void nearDuplicateMiddle_isRemoved() {
+    Path.Coordinates cleaned = Path.removeNearDuplicatePoints(
+        "37.38123158089662,37.38085097187389,37.38085097077727,37.38115767717581,37.381522510035516",
+        "126.95386737801618,126.95405673616432,126.95405391340378,126.95498524127483,126.95477049143811");
+
+    assertThat(cleaned.pathLat()).isEqualTo("37.38123158089662,37.38085097187389,37.38115767717581,37.381522510035516");
+  }
+
+  @Test
+  @DisplayName("겹친 점이 없으면 그대로 두고, 꼭짓점은 3개 아래로 줄이지 않는다")
+  void cleanShape_isKept() {
+    assertThat(Path.removeNearDuplicatePoints("37.1,37.2,37.3", "126.1,126.2,126.3"))
+        .isEqualTo(new Path.Coordinates("37.1,37.2,37.3", "126.1,126.2,126.3"));
+    assertThat(Path.removeNearDuplicatePoints("37.4,37.4001,37.40001", "127.0,127.0001,127.00001").pathLat())
+        .isEqualTo("37.4,37.4001,37.40001");
+  }
+
+  @Test
   @DisplayName("개수가 다르거나, 꼭짓점이 3개 미만이거나, 숫자가 아니거나, 범위를 벗어나면 거부한다")
   void invalidInput_throws() {
     assertThatThrownBy(() -> Path.toPolygonWkt("37.1,37.2,37.3", "126.1,126.2"))
