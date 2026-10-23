@@ -92,12 +92,15 @@ public class PendingAddressServiceImpl implements PendingAddressService {
 
         // N번 세이브 대신에 saveAll() 한 번에 처리
         List<PendingPath> pendingPaths = addressDTO.getPaths().stream()
-                .map(path -> PendingPath.builder()
-                        .divisionArea(path.getDivisionArea())
-                        .pathLat(path.getPathLat())
-                        .pathLng(path.getPathLng())
-                        .pendingAddress(savedAddress)
-                        .build())
+                .map(path -> {
+                    Path.Coordinates cleaned = Path.removeNearDuplicatePoints(path.getPathLat(), path.getPathLng());
+                    return PendingPath.builder()
+                            .divisionArea(path.getDivisionArea())
+                            .pathLat(cleaned.pathLat())
+                            .pathLng(cleaned.pathLng())
+                            .pendingAddress(savedAddress)
+                            .build();
+                })
                 .toList();
 
         pathRepository.saveAll(pendingPaths);
@@ -153,6 +156,8 @@ public class PendingAddressServiceImpl implements PendingAddressService {
         for (AddressDto.PathRequest path : address.getPaths()) {
             try {
                 Path.toPolygonWkt(path.getPathLat(), path.getPathLng());
+                Path.Coordinates cleaned = Path.removeNearDuplicatePoints(path.getPathLat(), path.getPathLng());
+                Path.toPolygonWkt(cleaned.pathLat(), cleaned.pathLng());
             } catch (IllegalArgumentException e) {
                 throw new BusinessException(ErrorCode.INVALID_INPUT);
             }
