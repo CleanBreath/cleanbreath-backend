@@ -3,6 +3,7 @@ package cleanbreath.backend.controller;
 import cleanbreath.backend.dto.FeedbackDto;
 import cleanbreath.backend.dto.common.MessageResponse;
 import cleanbreath.backend.service.FeedbackService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class FeedbackController {
 
     // 사용자 피드백 추가하기
     @PostMapping("/feedback/add")
-    public ResponseEntity<MessageResponse> addFeedback(@RequestBody FeedbackDto.Create saveDto) {
+    public ResponseEntity<MessageResponse> addFeedback(@Valid @RequestBody FeedbackDto.Create saveDto) {
         MessageResponse saveFeedback = feedbackService.save(saveDto);
         return ResponseEntity.ok(saveFeedback);
     }

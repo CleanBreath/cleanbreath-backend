@@ -89,4 +89,16 @@ class AdminTokenInterceptorTest {
             .content("{\"title\":\"제목\",\"content\":\"내용\"}"))
         .andExpect(status().isOk());
   }
+
+  @Test
+  @DisplayName("제목이나 내용이 비어 있는 피드백 등록은 400")
+  void addFeedback_blankFields_return400() throws Exception {
+    MockMvc mockMvc = mockMvcWith(TOKEN);
+
+    mockMvc.perform(post("/v1/feedback/add").contentType(MediaType.APPLICATION_JSON).content("{}"))
+        .andExpect(status().isBadRequest());
+    mockMvc.perform(post("/v1/feedback/add").contentType(MediaType.APPLICATION_JSON)
+            .content("{\"title\":\" \",\"content\":\"내용\"}"))
+        .andExpect(status().isBadRequest());
+  }
 }
