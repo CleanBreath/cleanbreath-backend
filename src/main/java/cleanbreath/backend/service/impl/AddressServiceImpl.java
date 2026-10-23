@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -38,6 +39,33 @@ public class AddressServiceImpl implements AddressService {
         Address findAddress = addressRepository.findByAddressPosLatAndAddressPosLng(lat, lng)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ADDRESS_NOT_FOUND));
         return new AddressDto.Response(findAddress);
+    }
+
+    public List<AddressDto.Response> getAddressesWithin(double swLat, double swLng, double neLat, double neLng) {
+        validateCoordinate(swLat, swLng);
+        validateCoordinate(neLat, neLng);
+        return toResponses(addressRepository.findIdsWithin(swLat, swLng, neLat, neLng));
+    }
+
+    public List<AddressDto.Response> getAddressesContaining(double lat, double lng) {
+        validateCoordinate(lat, lng);
+        return toResponses(addressRepository.findIdsContaining(lat, lng));
+    }
+
+    private List<AddressDto.Response> toResponses(Collection<Long> ids) {
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+        return addressRepository.findAllWithPathsByIdIn(ids).stream()
+                .map(AddressDto.Response::new)
+                .toList();
+    }
+
+    // NaN도 여기서 걸러진다 (비교가 모두 false)
+    private void validateCoordinate(double lat, double lng) {
+        if (!(lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180)) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
+        }
     }
 
     public BaseResponse updateAddress(AddressDto.CheckUpdate updateAtDTO) {
