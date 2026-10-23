@@ -9,5 +9,7 @@ import java.util.List;
 public interface AddressService {
     List<AddressDto.Response> getAllAddresses();
     AddressDto.Response getAddress(Double lat, Double lng);
+    List<AddressDto.Response> getAddressesWithin(double swLat, double swLng, double neLat, double neLng);
+    List<AddressDto.Response> getAddressesContaining(double lat, double lng);
     BaseResponse updateAddress(AddressDto.CheckUpdate updateAtDTO);
 }

@@ -3,6 +3,7 @@ package cleanbreath.backend.service.impl;
 import cleanbreath.backend.dto.AddressDto;
 import cleanbreath.backend.dto.PendingDto;
 import cleanbreath.backend.dto.common.MessageResponse;
+import cleanbreath.backend.entity.Path;
 import cleanbreath.backend.entity.pending.AreaValidationRequest;
 import cleanbreath.backend.entity.pending.PendingAddress;
 import cleanbreath.backend.entity.pending.PendingPath;
@@ -144,6 +145,17 @@ public class PendingAddressServiceImpl implements PendingAddressService {
         }
         if (address.getUpdateAt() == null || address.getCategory().isBlank()) {
             throw new BusinessException(ErrorCode.INVALID_INPUT);
+        }
+        if (address.getPaths() == null || address.getPaths().isEmpty()) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
+        }
+        // 승격 배치가 다각형으로 바꾸다 실패하지 않도록 등록 시점에 검사한다
+        for (AddressDto.PathRequest path : address.getPaths()) {
+            try {
+                Path.toPolygonWkt(path.getPathLat(), path.getPathLng());
+            } catch (IllegalArgumentException e) {
+                throw new BusinessException(ErrorCode.INVALID_INPUT);
+            }
         }
     }
 }

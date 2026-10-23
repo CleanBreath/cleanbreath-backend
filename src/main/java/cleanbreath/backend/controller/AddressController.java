@@ -42,6 +42,27 @@ public class AddressController {
     }
 
     /**
+     * 대표 좌표가 지도 화면 사각형(남서·북동 모서리) 안에 있는 구역을 반환한다.
+     * @apiNote '/v1/address/within?swLat=37.38&swLng=126.95&neLat=37.40&neLng=126.97'
+     */
+    @GetMapping("/address/within")
+    public ResponseEntity<?> getAddressesWithin(@RequestParam("swLat") double swLat, @RequestParam("swLng") double swLng,
+                                                @RequestParam("neLat") double neLat, @RequestParam("neLng") double neLng) {
+        List<AddressDto.Response> result = addressService.getAddressesWithin(swLat, swLng, neLat, neLng);
+        return ResponseEntity.ok(ApiResponse.of(result.size(), LocalDateTime.now(), result));
+    }
+
+    /**
+     * 구역 다각형이 이 좌표를 포함하는 구역을 반환한다. (지금 이 위치가 금연·흡연 구역인지)
+     * @apiNote '/v1/address/contains?lat=37.3928&lng=126.9637'
+     */
+    @GetMapping("/address/contains")
+    public ResponseEntity<?> getAddressesContaining(@RequestParam("lat") double lat, @RequestParam("lng") double lng) {
+        List<AddressDto.Response> result = addressService.getAddressesContaining(lat, lng);
+        return ResponseEntity.ok(ApiResponse.of(result.size(), LocalDateTime.now(), result));
+    }
+
+    /**
      * 날짜 값을 받아 30일 지나면 최신데이터를 다시 반환하고, 지나지 않으면 업데이트 시기가 아니라고 메시지 반환한다.
      * @apiNote '/v1/updateDate
      */

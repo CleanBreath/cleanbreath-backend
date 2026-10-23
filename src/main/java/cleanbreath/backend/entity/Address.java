@@ -11,6 +11,7 @@ import java.util.List;
 @Table(name = "address", indexes = {
     // 위도/경도 복합 인덱스 - findByAddressPosLatAndAddressPosLng 쿼리 최적화
     @Index(name = "idx_address_lat_lng", columnList = "address_pos_lat, address_pos_lng")
+    // 대표 좌표 공간 인덱스(idx_address_location)는 DB 생성 컬럼 location에 있다 (infra/sql/2026-10-23-spatial-index.sql)
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
