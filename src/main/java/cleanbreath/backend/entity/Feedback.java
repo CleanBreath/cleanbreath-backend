@@ -26,8 +26,8 @@ public class Feedback {
     @Column(name = "fd_content", columnDefinition = "MEDIUMTEXT")
     private String content;
 
-    public void updateFeedback(LocalDateTime updateAt, String title, String content) {
-        this.createAt = updateAt;
+    // createAt은 1년 보관 기간의 기준이라 수정해도 바꾸지 않는다
+    public void updateFeedback(String title, String content) {
         this.title = title;
         this.content = content;
     }
