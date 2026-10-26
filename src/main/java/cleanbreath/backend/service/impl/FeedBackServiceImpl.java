@@ -48,7 +48,6 @@ public class FeedBackServiceImpl implements FeedbackService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.FEEDBACK_NOT_FOUND));
 
         findFeedback.updateFeedback(
-                updateDTO.getUpdateAt(),
                 updateDTO.getTitle(),
                 updateDTO.getContent()
         );

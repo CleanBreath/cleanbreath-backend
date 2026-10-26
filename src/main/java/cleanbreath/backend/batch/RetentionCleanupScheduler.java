@@ -17,6 +17,7 @@ import java.util.List;
 /**
  * 개인정보처리방침의 보관 기간이 지난 데이터를 매일 파기하는 스케줄러.
  * 피드백은 접수 후 1년, 승인되지 않은 구역 요청은 투표 기록과 함께 등록 후 6개월에 파기합니다.
+ * 공용 RDS가 23:00~08:30(KST)에 중지되므로 기본 실행 시각은 09:30입니다.
  */
 @Slf4j
 @Component
@@ -28,7 +29,7 @@ public class RetentionCleanupScheduler {
   private final PendingPathRepository pendingPathRepository;
   private final SmokingAreaValidateRepository validationRepository;
 
-  @Scheduled(cron = "${batch.retention.cron:0 30 3 * * *}", zone = "Asia/Seoul")
+  @Scheduled(cron = "${batch.retention.cron:0 30 9 * * *}", zone = "Asia/Seoul")
   @Transactional
   public void purgeExpired() {
     LocalDateTime now = LocalDateTime.now();

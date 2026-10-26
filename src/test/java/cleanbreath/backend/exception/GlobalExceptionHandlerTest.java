@@ -5,6 +5,9 @@ import jakarta.validation.Valid;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.core.PropertyReferenceException;
+import org.springframework.data.core.TypeInformation;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -35,6 +40,17 @@ class GlobalExceptionHandlerTest {
     @GetMapping("/v1/number")
     String number(@RequestParam("n") Integer n) {
       return "ok";
+    }
+
+    // 없는 sort 속성이면 Spring Data가 쿼리를 만들다 던진다
+    @GetMapping("/v1/sorted")
+    String sorted() {
+      throw new PropertyReferenceException("nope", TypeInformation.of(String.class), List.of());
+    }
+
+    @GetMapping("/v1/duplicate")
+    String duplicate() {
+      throw new DataIntegrityViolationException("Duplicate entry 'x' for key 'uk_client_token_target_id'");
     }
 
     @GetMapping("/v1/boom")
@@ -98,6 +114,22 @@ class GlobalExceptionHandlerTest {
     mockMvc.perform(get("/v1/nope"))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.message").value("요청한 경로를 찾을 수 없습니다."));
+  }
+
+  @Test
+  @DisplayName("없는 정렬 속성이면 500 대신 400을 반환한다")
+  void badSortProperty_returns400() throws Exception {
+    mockMvc.perform(get("/v1/sorted"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value(ErrorCode.INVALID_INPUT.getMessage()));
+  }
+
+  @Test
+  @DisplayName("DB 제약 위반은 SQL 내용 없이 409를 반환한다")
+  void dataIntegrityViolation_returns409() throws Exception {
+    mockMvc.perform(get("/v1/duplicate"))
+        .andExpect(status().isConflict())
+        .andExpect(jsonPath("$.message").value("요청이 기존 데이터와 충돌합니다."));
   }
 
   @Test

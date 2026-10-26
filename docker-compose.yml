@@ -9,7 +9,8 @@ services:
     # java가 PID 1이면 HEALTHCHECK wget 좀비를 회수하지 못해 PID 한도가 바닥난다
     init: true
     ports:
-      - "8080:8080"
+      # 호스트 밖에서 직접 붙지 못하게 루프백에만 연다 (앞단 프록시 경유)
+      - "127.0.0.1:8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - DB_HOSTNAME=${DB_HOSTNAME}
@@ -18,10 +19,6 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
     env_file:
       - .env
-    depends_on:
-      - db
-    networks:
-      - cleanbreath-network
     restart: unless-stopped
     healthcheck:
       test:
