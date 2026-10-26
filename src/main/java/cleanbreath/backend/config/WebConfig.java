@@ -18,14 +18,14 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${admin.token:}")
     private String adminToken;
 
-    // CORS 설정
+    // CORS 설정: 인증은 Authorization 헤더라 쿠키(credentials)는 허용하지 않는다, PATCH 엔드포인트는 없음
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins(allowedOrigins)
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("Authorization", "Content-Type")
-                .allowCredentials(true)
+                .allowCredentials(false)
                 .maxAge(3600);
     }
 

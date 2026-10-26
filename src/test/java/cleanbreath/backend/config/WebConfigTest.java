@@ -50,4 +50,13 @@ class WebConfigTest {
     assertThat(cors.checkOrigin(LOCAL)).isEqualTo(LOCAL);
     assertThat(cors.checkOrigin("https://evil.example")).isNull();
   }
+
+  @Test
+  @DisplayName("Bearer 헤더 인증이라 credentials는 허용하지 않고, 쓰지 않는 PATCH는 막는다")
+  void noCredentials_noPatch() {
+    CorsConfiguration cors = corsFor(PROD);
+
+    assertThat(cors.getAllowCredentials()).isFalse();
+    assertThat(cors.getAllowedMethods()).containsExactly("GET", "POST", "PUT", "DELETE");
+  }
 }
