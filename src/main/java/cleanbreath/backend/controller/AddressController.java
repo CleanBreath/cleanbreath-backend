@@ -1,6 +1,7 @@
 package cleanbreath.backend.controller;
 
 import cleanbreath.backend.dto.AddressDto;
+import cleanbreath.backend.dto.PublicNoSmokingZoneDto;
 import cleanbreath.backend.dto.common.ApiResponse;
 import cleanbreath.backend.service.AddressService;
 import jakarta.validation.Valid;
@@ -59,6 +60,17 @@ public class AddressController {
     @GetMapping("/address/contains")
     public ResponseEntity<?> getAddressesContaining(@RequestParam("lat") double lat, @RequestParam("lng") double lng) {
         List<AddressDto.Response> result = addressService.getAddressesContaining(lat, lng);
+        return ResponseEntity.ok(ApiResponse.of(result.size(), LocalDateTime.now(), result));
+    }
+
+    /**
+     * 지도 화면 사각형 안의 공공데이터 실외 금연구역(점 좌표)을 반환한다. 최대 3000건.
+     * @apiNote '/v1/publicZone/within?swLat=37.55&swLng=126.97&neLat=37.57&neLng=126.99'
+     */
+    @GetMapping("/publicZone/within")
+    public ResponseEntity<?> getPublicZonesWithin(@RequestParam("swLat") double swLat, @RequestParam("swLng") double swLng,
+                                                  @RequestParam("neLat") double neLat, @RequestParam("neLng") double neLng) {
+        List<PublicNoSmokingZoneDto.Response> result = addressService.getPublicZonesWithin(swLat, swLng, neLat, neLng);
         return ResponseEntity.ok(ApiResponse.of(result.size(), LocalDateTime.now(), result));
     }
 

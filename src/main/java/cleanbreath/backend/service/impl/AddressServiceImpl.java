@@ -1,6 +1,7 @@
 package cleanbreath.backend.service.impl;
 
 import cleanbreath.backend.dto.AddressDto;
+import cleanbreath.backend.dto.PublicNoSmokingZoneDto;
 import cleanbreath.backend.dto.common.ApiResponse;
 import cleanbreath.backend.dto.common.BaseResponse;
 import cleanbreath.backend.dto.common.MessageResponse;
@@ -8,6 +9,7 @@ import cleanbreath.backend.entity.Address;
 import cleanbreath.backend.exception.BusinessException;
 import cleanbreath.backend.exception.ErrorCode;
 import cleanbreath.backend.repository.AddressRepository;
+import cleanbreath.backend.repository.PublicNoSmokingZoneRepository;
 import cleanbreath.backend.service.AddressService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +27,11 @@ import java.util.List;
 @Slf4j
 public class AddressServiceImpl implements AddressService {
     private static final long UPDATE_THRESHOLD_DAYS = 30;
+    // 화면이 넓어도 응답이 커지지 않게 막는다. 프론트는 확대했을 때만 부른다
+    private static final int PUBLIC_ZONE_LIMIT = 3000;
     
     private final AddressRepository addressRepository;
+    private final PublicNoSmokingZoneRepository publicNoSmokingZoneRepository;
 
     public List<AddressDto.Response> getAllAddresses() {
         List<Address> findAddressList = addressRepository.findAllWithPaths();
@@ -50,6 +55,14 @@ public class AddressServiceImpl implements AddressService {
     public List<AddressDto.Response> getAddressesContaining(double lat, double lng) {
         validateCoordinate(lat, lng);
         return toResponses(addressRepository.findIdsContaining(lat, lng));
+    }
+
+    public List<PublicNoSmokingZoneDto.Response> getPublicZonesWithin(double swLat, double swLng, double neLat, double neLng) {
+        validateCoordinate(swLat, swLng);
+        validateCoordinate(neLat, neLng);
+        return publicNoSmokingZoneRepository.findWithin(swLat, swLng, neLat, neLng, PUBLIC_ZONE_LIMIT).stream()
+                .map(PublicNoSmokingZoneDto.Response::new)
+                .toList();
     }
 
     private List<AddressDto.Response> toResponses(Collection<Long> ids) {
