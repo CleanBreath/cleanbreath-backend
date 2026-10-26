@@ -4,6 +4,9 @@ package cleanbreath.backend.exception;
 import cleanbreath.backend.dto.common.MessageResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.core.PropertyReferenceException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.ErrorResponse;
@@ -41,11 +44,12 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException.class,
             HandlerMethodValidationException.class,
             ConstraintViolationException.class,
+            PropertyReferenceException.class,
             NoResourceFoundException.class,
             NoHandlerFoundException.class
     })
     public ResponseEntity<MessageResponse> handleClientError(Exception e) {
-        log.warn("{}: {}", e.getClass().getSimpleName(), e.getMessage());
+        log.warn("{}: {}", e.getClass().getSimpleName(), stripNewlines(e.getMessage()));
 
         // ErrorResponse 구현 예외는 Spring이 정한 상태 코드와 헤더(405의 Allow, 415의 Accept)를 그대로 사용
         ResponseEntity.BodyBuilder response = e instanceof ErrorResponse er
@@ -63,6 +67,15 @@ public class GlobalExceptionHandler {
         return response.body(MessageResponse.of(message));
     }
 
+    // 중복 투표 경쟁 등 DB 제약 위반은 409로 응답하고, SQL이 담긴 원인은 로그로만 남김
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<MessageResponse> handleDataIntegrityViolation(DataIntegrityViolationException e) {
+        log.warn("DataIntegrityViolationException: {}", stripNewlines(e.getMostSpecificCause().getMessage()));
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(MessageResponse.of("요청이 기존 데이터와 충돌합니다."));
+    }
+
     // 예상치 못한 서버 오류는 상세 내용을 노출하지 않고 로그로만 기록
     @ExceptionHandler(Exception.class)
     public ResponseEntity<MessageResponse> handleException(Exception e) {
@@ -70,5 +83,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .internalServerError()
                 .body(MessageResponse.of("서버 내부 오류가 발생했습니다."));
+    }
+
+    // 예외 메시지에 요청 값이 섞여 있어 줄바꿈으로 가짜 로그 줄을 만들지 못하게 한다
+    private static String stripNewlines(String message) {
+        return message == null ? null : message.replaceAll("[\r\n]", "_");
     }
 }
