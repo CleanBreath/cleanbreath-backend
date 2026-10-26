@@ -50,7 +50,9 @@ RDS 로그인 모니터링 1.20 USD/vCPU). 정확한 값은 체험 기간 중 Gu
 
 3. 검증:
    - `aws ec2 describe-security-groups --region ap-northeast-2 --group-ids sg-04abc98cb9e5262b8` 에 `PrefixListIds`가 붙은 80/443 규칙이 보이는지 확인
-   - 하루 정도 nginx 접근 로그의 클라이언트 IP(`$remote_addr`)가 전부 Cloudflare 대역인지 확인. 다른 IP가 정상 트래픽이면 원인을 먼저 정리한다
+   - 하루 정도 오리진에 실제로 접속한 IP가 전부 Cloudflare 대역인지 확인. 다른 IP가 정상 트래픽이면 원인을 먼저 정리한다.
+     CleanBreath 서버 블록은 real_ip(CF-Connecting-IP)로 `$remote_addr`를 사용자 IP로 바꾸므로 로그의 `$remote_addr`가 아니라
+     `$realip_remote_addr`(로그 형식에 추가)나 `sudo ss -tn state established '( sport = :443 )'`의 피어 주소로 본다
 4. 0.0.0.0/0 제거:
 
    ```bash
