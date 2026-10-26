@@ -4,6 +4,7 @@ import cleanbreath.backend.dto.AddressDto;
 import cleanbreath.backend.dto.PendingDto;
 import cleanbreath.backend.dto.common.MessageResponse;
 import cleanbreath.backend.service.PendingAddressService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,13 +42,13 @@ public class PendingAddressController {
     @PostMapping("/smokingArea/{id}/vote")
     public ResponseEntity<MessageResponse> voteArea(
             @PathVariable Long id,
-            @RequestBody PendingDto.ValidationVoteRequest request) {
+            @Valid @RequestBody PendingDto.ValidationVoteRequest request) {
         MessageResponse message = pendingAddressService.vote(id, request);
         return ResponseEntity.ok(message);
     }
 
     @PostMapping("/smokingArea/add")
-    public ResponseEntity<MessageResponse> addSmokingArea(@RequestBody AddressDto.Request requestSmokingArea) {
+    public ResponseEntity<MessageResponse> addSmokingArea(@Valid @RequestBody AddressDto.Request requestSmokingArea) {
         MessageResponse message = pendingAddressService.saveAddressData(requestSmokingArea);
         return ResponseEntity.ok(message);
     }

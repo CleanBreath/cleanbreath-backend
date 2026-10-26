@@ -5,7 +5,8 @@ import cleanbreath.backend.entity.DivisionArea;
 import cleanbreath.backend.entity.Path;
 import cleanbreath.backend.entity.pending.PendingAddress;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,12 +23,20 @@ public class AddressDto {
     public static class Request {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime updateAt;
+        // 컬럼 길이(VARCHAR 255)를 넘기면 DB 오류(500)가 나므로 요청 단계에서 막는다
+        @NotBlank @Size(max = 255)
         private String addressName;
+        @NotBlank @Size(max = 255)
         private String buildingName;
+        @NotNull @DecimalMin("-90") @DecimalMax("90")
         private Double latitude;
+        @NotNull @DecimalMin("-180") @DecimalMax("180")
         private Double longitude;
+        @NotBlank @Size(max = 50)
         private String category;
-        private List<PathRequest> paths;
+        // 익명 등록이라 한 요청이 만들 수 있는 영역 수와 좌표 길이를 제한한다
+        @NotEmpty @Size(max = 10)
+        private List<@Valid @NotNull PathRequest> paths;
 
         public PendingAddress toEntity() {
             return PendingAddress.builder()
@@ -88,8 +97,11 @@ public class AddressDto {
     @Setter
     @NoArgsConstructor
     public static class PathRequest {
+        @NotNull
         private DivisionArea divisionArea;
+        @NotBlank @Size(max = 20000)
         private String pathLat;
+        @NotBlank @Size(max = 20000)
         private String pathLng;
     }
 

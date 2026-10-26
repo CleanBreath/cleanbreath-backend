@@ -4,6 +4,8 @@ import cleanbreath.backend.entity.DivisionArea;
 import cleanbreath.backend.entity.pending.PendingAddress;
 import cleanbreath.backend.entity.pending.PendingPath;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -79,6 +81,8 @@ public class PendingDto {
     @Setter
     @NoArgsConstructor
     public static class ValidationVoteRequest {
+        // 프론트엔드는 crypto.randomUUID()(36자)를 보낸다
+        @NotBlank @Size(max = 64)
         private String clientToken;
         // Lombok이 boolean isTruth의 setter를 setTruth로 만들어 JSON 키가 truth로 매핑되던 문제를 막는다
         @JsonProperty("isTruth")

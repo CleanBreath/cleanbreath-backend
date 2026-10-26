@@ -40,7 +40,7 @@ public class FeedbackController {
 
     // 해당 피드백 업데이트
     @PutMapping("/feedback/{id}")
-    public ResponseEntity<MessageResponse> updateFeedback(@PathVariable("id") Long id, @RequestBody FeedbackDto.Update updateDTO) {
+    public ResponseEntity<MessageResponse> updateFeedback(@PathVariable("id") Long id, @Valid @RequestBody FeedbackDto.Update updateDTO) {
         MessageResponse updateMessage = feedbackService.updateFeedBack(id, updateDTO);
         return ResponseEntity.ok(updateMessage);
     }
