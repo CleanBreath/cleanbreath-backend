@@ -35,7 +35,7 @@ CleanBreath는 안양시의 금연구역 및 흡연구역 정보를 제공하는
 ### 4. 신규 구역 제안
 
 - 사용자가 새로운 흡연구역 제안
-- 제안된 구역 관리 및 검토
+- 제안된 구역 투표 및 관리자 승인 후 지도 반영
 - 페이징 처리를 통한 효율적인 데이터 조회
 
 ## 🛠 기술 스택
@@ -538,6 +538,33 @@ POST /v1/smokingArea/add
 ```json
 {
   "message": "주소 및 영역 저장 성공"
+}
+```
+
+#### 4. 승인 후보 조회 (관리자)
+
+투표는 익명이라 지도 반영은 자동으로 하지 않고 관리자가 승인합니다. ‘사실이에요’가 `promotion.threshold`(기본 20) 이상이고 ‘아니에요’의 2배 이상인 요청이 후보입니다.
+`Authorization: Bearer <ADMIN_TOKEN>` 헤더가 없거나 틀리면 401을 반환합니다.
+
+```http
+GET /v1/admin/smokingArea/candidates
+```
+
+**Response**: `GET /v1/smokingArea/{id}`와 같은 형식(`truthCount`, `untruthCount` 포함)의 배열
+
+#### 5. 요청 구역 승인 (관리자)
+
+요청 구역을 지도 데이터(address/path)로 옮기고, 요청과 투표 기록을 삭제합니다.
+
+```http
+POST /v1/admin/smokingArea/{id}/approve
+```
+
+**Response**
+
+```json
+{
+  "message": "승인되어 지도에 반영되었습니다."
 }
 ```
 

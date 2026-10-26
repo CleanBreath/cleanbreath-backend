@@ -1,8 +1,11 @@
 package cleanbreath.backend.config;
 
+import cleanbreath.backend.controller.AdminPendingAddressController;
 import cleanbreath.backend.controller.FeedbackController;
+import cleanbreath.backend.controller.PendingAddressController;
 import cleanbreath.backend.exception.GlobalExceptionHandler;
 import cleanbreath.backend.service.FeedbackService;
+import cleanbreath.backend.service.PendingAddressService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -14,7 +17,12 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -22,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * WebConfig에 등록한 관리용 피드백 API 토큰 검사 테스트.
+ * WebConfig에 등록한 관리용 피드백·구역 승인 API 토큰 검사 테스트.
  */
 class AdminTokenInterceptorTest {
 
@@ -35,13 +43,17 @@ class AdminTokenInterceptorTest {
     }
   }
 
+  private final PendingAddressService pendingService = mock(PendingAddressService.class);
+
   private MockMvc mockMvcWith(String adminToken) {
     WebConfig config = new WebConfig();
     ReflectionTestUtils.setField(config, "adminToken", adminToken);
     ExposedInterceptorRegistry registry = new ExposedInterceptorRegistry();
     config.addInterceptors(registry);
 
-    return MockMvcBuilders.standaloneSetup(new FeedbackController(mock(FeedbackService.class)))
+    return MockMvcBuilders.standaloneSetup(new FeedbackController(mock(FeedbackService.class)),
+            new AdminPendingAddressController(pendingService),
+            new PendingAddressController(pendingService))
         .setControllerAdvice(new GlobalExceptionHandler())
         .addInterceptors(registry.interceptors().stream().map(HandlerInterceptor.class::cast)
             .toArray(HandlerInterceptor[]::new))
@@ -78,6 +90,36 @@ class AdminTokenInterceptorTest {
 
     mockMvc.perform(get("/v1/feedback-list").header("Authorization", "Bearer "))
         .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  @DisplayName("구역 승인 후보 조회와 승인은 토큰이 있어야 한다")
+  void adminSmokingArea_requiresToken() throws Exception {
+    MockMvc mockMvc = mockMvcWith(TOKEN);
+
+    mockMvc.perform(get("/v1/admin/smokingArea/candidates")).andExpect(status().isUnauthorized());
+    mockMvc.perform(post("/v1/admin/smokingArea/1/approve")).andExpect(status().isUnauthorized());
+    verify(pendingService, never()).approve(any());
+
+    mockMvc.perform(post("/v1/admin/smokingArea/1/approve").header("Authorization", "Bearer " + TOKEN))
+        .andExpect(status().isOk());
+    verify(pendingService).approve(1L);
+  }
+
+  @Test
+  @DisplayName("투표는 토큰 없이 가능하고 프론트가 보내는 isTruth 키를 그대로 읽는다")
+  void vote_isPublic_andBindsIsTruth() throws Exception {
+    MockMvc mockMvc = mockMvcWith(TOKEN);
+
+    mockMvc.perform(post("/v1/smokingArea/1/vote").contentType(MediaType.APPLICATION_JSON)
+            .content("{\"clientToken\":\"t1\",\"isTruth\":true}"))
+        .andExpect(status().isOk());
+    mockMvc.perform(post("/v1/smokingArea/1/vote").contentType(MediaType.APPLICATION_JSON)
+            .content("{\"clientToken\":\"t2\",\"isTruth\":false}"))
+        .andExpect(status().isOk());
+
+    verify(pendingService).vote(eq(1L), argThat(r -> r.getClientToken().equals("t1") && r.isTruth()));
+    verify(pendingService).vote(eq(1L), argThat(r -> r.getClientToken().equals("t2") && !r.isTruth()));
   }
 
   @Test

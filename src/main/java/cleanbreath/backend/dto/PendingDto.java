@@ -3,6 +3,7 @@ package cleanbreath.backend.dto;
 import cleanbreath.backend.entity.DivisionArea;
 import cleanbreath.backend.entity.pending.PendingAddress;
 import cleanbreath.backend.entity.pending.PendingPath;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -79,7 +80,9 @@ public class PendingDto {
     @NoArgsConstructor
     public static class ValidationVoteRequest {
         private String clientToken;
-        private boolean isTruth;
+        // Lombok이 boolean isTruth의 setter를 setTruth로 만들어 JSON 키가 truth로 매핑되던 문제를 막는다
+        @JsonProperty("isTruth")
+        private boolean truth;
     }
 
     @Getter
