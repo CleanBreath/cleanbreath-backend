@@ -6,6 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: cleanbreath-backend
+    # java가 PID 1이면 HEALTHCHECK wget 좀비를 회수하지 못해 PID 한도가 바닥난다
+    init: true
     ports:
       - "8080:8080"
     environment:
