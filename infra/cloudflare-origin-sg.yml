@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Cloudflare proxy IP prefix lists and HTTP/HTTPS ingress rules for the shared CleanBreath/PickTrip origin security group
+
+# 기존 SG(launch-wizard-6)에 Cloudflare 대역 규칙만 "추가"한다. 0.0.0.0/0 규칙은 이 스택이 건드리지 않으며,
+# 검증 후 infra/README.md의 전환 순서대로 CLI로 직접 제거한다.
+# Cloudflare 대역 출처: https://www.cloudflare.com/ips-v4 , https://www.cloudflare.com/ips-v6 (2026-10-26 기준 IPv4 15개, IPv6 7개)
+#
+# 규칙 수 계산: 프리픽스 리스트를 참조한 규칙은 MaxEntries만큼 SG 규칙으로 계산되고, SG 인바운드 한도는 60(IPv4/IPv6 별도)이다.
+#   IPv4: 80/443 x MaxEntries 20 = 40 + SSH 1 + 전환 중 남아 있는 0.0.0.0/0 2 = 43 <= 60
+#   IPv6를 켜도 2 x 10 = 20으로 IPv6 한도 안. 두 주소 체계가 한 한도로 합산되는 최악의 경우에도 63이 되지 않도록
+#   IPv6는 기본 꺼 둔다(인스턴스에 IPv6 주소가 없어서 Cloudflare가 IPv6로 오리진에 붙을 일도 없음).
+
+Parameters:
+  SecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Default: sg-04abc98cb9e5262b8
+    Description: Origin security group shared by CleanBreath and PickTrip
+  IncludeIpv6:
+    Type: String
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Also allow Cloudflare IPv6 ranges - only needed if the origin gets an IPv6 address and AAAA record
+
+Conditions:
+  UseIpv6: !Equals [!Ref IncludeIpv6, "true"]
+
+Resources:
+  CloudflareIpv4PrefixList:
+    Type: AWS::EC2::PrefixList
+    Properties:
+      PrefixListName: cloudflare-ipv4
+      AddressFamily: IPv4
+      # 현재 15개, Cloudflare가 대역을 추가해도 스택 업데이트로 담을 여유 5개
+      MaxEntries: 20
+      Entries:
+        - { Cidr: 173.245.48.0/20, Description: Cloudflare }
+        - { Cidr: 103.21.244.0/22, Description: Cloudflare }
+        - { Cidr: 103.22.200.0/22, Description: Cloudflare }
+        - { Cidr: 103.31.4.0/22, Description: Cloudflare }
+        - { Cidr: 141.101.64.0/18, Description: Cloudflare }
+        - { Cidr: 108.162.192.0/18, Description: Cloudflare }
+        - { Cidr: 190.93.240.0/20, Description: Cloudflare }
+        - { Cidr: 188.114.96.0/20, Description: Cloudflare }
+        - { Cidr: 197.234.240.0/22, Description: Cloudflare }
+        - { Cidr: 198.41.128.0/17, Description: Cloudflare }
+        - { Cidr: 162.158.0.0/15, Description: Cloudflare }
+        - { Cidr: 104.16.0.0/13, Description: Cloudflare }
+        - { Cidr: 104.24.0.0/14, Description: Cloudflare }
+        - { Cidr: 172.64.0.0/13, Description: Cloudflare }
+        - { Cidr: 131.0.72.0/22, Description: Cloudflare }
+      Tags:
+        - Key: Project
+          Value: CleanBreath
+
+  CloudflareIpv6PrefixList:
+    Type: AWS::EC2::PrefixList
+    Condition: UseIpv6
+    Properties:
+      PrefixListName: cloudflare-ipv6
+      AddressFamily: IPv6
+      MaxEntries: 10
+      Entries:
+        - { Cidr: "2400:cb00::/32", Description: Cloudflare }
+        - { Cidr: "2606:4700::/32", Description: Cloudflare }
+        - { Cidr: "2803:f800::/32", Description: Cloudflare }
+        - { Cidr: "2405:b500::/32", Description: Cloudflare }
+        - { Cidr: "2405:8100::/32", Description: Cloudflare }
+        - { Cidr: "2a06:98c0::/29", Description: Cloudflare }
+        - { Cidr: "2c0f:f248::/32", Description: Cloudflare }
+      Tags:
+        - Key: Project
+          Value: CleanBreath
+
+  HttpFromCloudflareIpv4:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroupId
+      IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      SourcePrefixListId: !Ref CloudflareIpv4PrefixList
+      Description: HTTP from Cloudflare IPv4
+
+  HttpsFromCloudflareIpv4:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroupId
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      SourcePrefixListId: !Ref CloudflareIpv4PrefixList
+      Description: HTTPS from Cloudflare IPv4
+
+  HttpFromCloudflareIpv6:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: UseIpv6
+    Properties:
+      GroupId: !Ref SecurityGroupId
+      IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      SourcePrefixListId: !Ref CloudflareIpv6PrefixList
+      Description: HTTP from Cloudflare IPv6
+
+  HttpsFromCloudflareIpv6:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: UseIpv6
+    Properties:
+      GroupId: !Ref SecurityGroupId
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      SourcePrefixListId: !Ref CloudflareIpv6PrefixList
+      Description: HTTPS from Cloudflare IPv6
+
+Outputs:
+  CloudflareIpv4PrefixListId:
+    Value: !Ref CloudflareIpv4PrefixList
+  CloudflareIpv6PrefixListId:
+    Condition: UseIpv6
+    Value: !Ref CloudflareIpv6PrefixList
