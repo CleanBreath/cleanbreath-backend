@@ -28,7 +28,6 @@ public class RetentionCleanupScheduler {
   private final PendingPathRepository pendingPathRepository;
   private final SmokingAreaValidateRepository validationRepository;
 
-  // 승격 배치(새벽 3시) 뒤에 실행해 승격 대상이 먼저 빠지도록 함
   @Scheduled(cron = "${batch.retention.cron:0 30 3 * * *}", zone = "Asia/Seoul")
   @Transactional
   public void purgeExpired() {

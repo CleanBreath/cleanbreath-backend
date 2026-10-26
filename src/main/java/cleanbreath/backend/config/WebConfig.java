@@ -29,11 +29,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .maxAge(3600);
     }
 
-    // 피드백 조회·수정·삭제는 관리자만, 피드백 등록은 공개
+    // 피드백 조회·수정·삭제와 /v1/admin/** 는 관리자만, 피드백 등록은 공개
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AdminTokenInterceptor(adminToken))
-                .addPathPatterns("/v1/feedback-list", "/v1/feedback/*")
+                .addPathPatterns("/v1/feedback-list", "/v1/feedback/*", "/v1/admin/**")
                 .excludePathPatterns("/v1/feedback/add");
     }
 }

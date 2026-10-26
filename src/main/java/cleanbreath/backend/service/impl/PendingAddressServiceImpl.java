@@ -3,25 +3,32 @@ package cleanbreath.backend.service.impl;
 import cleanbreath.backend.dto.AddressDto;
 import cleanbreath.backend.dto.PendingDto;
 import cleanbreath.backend.dto.common.MessageResponse;
+import cleanbreath.backend.entity.Address;
 import cleanbreath.backend.entity.Path;
 import cleanbreath.backend.entity.pending.AreaValidationRequest;
 import cleanbreath.backend.entity.pending.PendingAddress;
 import cleanbreath.backend.entity.pending.PendingPath;
 import cleanbreath.backend.exception.BusinessException;
 import cleanbreath.backend.exception.ErrorCode;
+import cleanbreath.backend.repository.AddressRepository;
+import cleanbreath.backend.repository.PathRepository;
 import cleanbreath.backend.repository.pending.PendingAddressRepository;
 import cleanbreath.backend.repository.pending.PendingPathRepository;
 import cleanbreath.backend.repository.pending.SmokingAreaValidateRepository;
 import cleanbreath.backend.service.PendingAddressService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -30,6 +37,12 @@ public class PendingAddressServiceImpl implements PendingAddressService {
     private final PendingAddressRepository addressRepository;
     private final PendingPathRepository pathRepository;
     private final SmokingAreaValidateRepository validationRepository;
+    private final AddressRepository mapAddressRepository;
+    private final PathRepository mapPathRepository;
+
+    // 관리자 승인 후보로 보여줄 최소 사실 투표 수
+    @Value("${promotion.threshold}")
+    private int promotionThreshold;
 
     public List<PendingDto.AddressResponse> getAllManageAddress() {
         return addressRepository.findAllWithPaths()
@@ -137,6 +150,48 @@ public class PendingAddressServiceImpl implements PendingAddressService {
         addressRepository.delete(findPendingAddress);
 
         return MessageResponse.of("해당 주소 및 영역 삭제 성공");
+    }
+
+    public List<PendingDto.DetailResponse> getPromotionCandidates() {
+        return addressRepository.findAddressesMeetingThreshold(promotionThreshold)
+                .stream()
+                .map(pending -> new PendingDto.DetailResponse(pending,
+                        validationRepository.sumTruthByPendingAddressId(pending.getId()),
+                        validationRepository.sumUntruthByPendingAddressId(pending.getId())))
+                .toList();
+    }
+
+    // 투표는 익명이라 조작될 수 있으므로, 지도 반영은 관리자가 승인한 요청만 한다
+    @Transactional
+    public MessageResponse approve(Long id) {
+        PendingAddress pending = addressRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PENDING_ADDRESS_NOT_FOUND));
+
+        Address savedAddress = mapAddressRepository.save(Address.builder()
+                .updateAt(LocalDateTime.now())
+                .addressName(pending.getAddressName())
+                .buildingName(pending.getBuildingName())
+                .addressPosLat(pending.getAddressPosLat())
+                .addressPosLng(pending.getAddressPosLng())
+                .addressCategory(pending.getAddressCategory())
+                .build());
+
+        // DivisionArea 기준으로 금연/흡연 구역 구분
+        mapPathRepository.saveAll(pending.getPaths().stream()
+                .map(pendingPath -> Path.builder()
+                        .address(savedAddress)
+                        .divisionArea(pendingPath.getDivisionArea())
+                        .pathLat(pendingPath.getPathLat())
+                        .pathLng(pendingPath.getPathLng())
+                        .build())
+                .toList());
+
+        validationRepository.deleteByPendingAddress(pending);
+        pathRepository.deleteByPendingAddress(pending);
+        addressRepository.delete(pending);
+
+        log.info("[승인] 요청 {} → 구역 {} 반영", id, savedAddress.getId());
+        return MessageResponse.of("승인되어 지도에 반영되었습니다.");
     }
 
     private void validateSaveRequest(AddressDto.Request address) {

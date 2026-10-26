@@ -25,4 +25,8 @@ public interface PendingAddressService {
     MessageResponse updateAddressData(Long id, AddressDto.Update addressDTO);
 
     MessageResponse deleteAddressData(Long id);
+
+    List<PendingDto.DetailResponse> getPromotionCandidates();
+
+    MessageResponse approve(Long id);
 }
